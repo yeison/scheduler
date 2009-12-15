@@ -47,54 +47,47 @@ public class Runner {
 		String input = String.valueOf(inputBuffer);
 		StringTokenizer st = new StringTokenizer(input, delimeter);
 		
-		
+		//Properly formatted input starts with the number of processes.
 		numberOfProcesses = Integer.valueOf(st.nextToken());
-		String c;
-		c = st.nextToken();
 		System.out.println("Number of Processes: " + numberOfProcesses);
+		//Use that value to make an array of the appropriate size to hold our Process objects.
 		Process[] processArray = new Process[numberOfProcesses];
 		
 		for(int i = 0; i < numberOfProcesses; i++){
-			c = st.nextToken();
-			if(c.compareTo("(") == 0)
-				processQueue.offer(makeProcess(st));
-			else
-				continue;
+			Process newProcess = makeProcess(st);
+			processQueue.offer(newProcess);
 		}
-		
-		for(int i = 0; i < processArray.length; i++){
-			processArray[i] = processQueue.poll();
-			System.out.println("Process " + i + " arrival time: " + processArray[i].arrivalTime);
+			
+		for(int i = 1; i <= processArray.length; i++){
+			processArray[i-1] = processQueue.poll();
+			System.out.println("Process " + i + " arrival time: " + processArray[i-1].arrivalTime);
 		}
 		
 		// TODO Auto-generated method stub
 	}
 	
+	/*The method below takes a StringTokenizer and reads the next four tokens from that tokenizer.  
+	 * The tokens will be interpreted as A B C and IO, respectively.  Using this data, the method
+	 * instantiates and returns a Process object.*/
+	/**
+	 * @param st - A string tokenizer whose next four tokens correspond to A B C and IO.
+	 * @return A new process object created from the data in the string tokenizer.
+	 */
 	static Process makeProcess(StringTokenizer st){
 		Process newProcess = new Process();
-		int[] processArray = new int[4];
+		int[] processData = new int[4];
 		
 		for(int i = 0; i < 4; i++){
-			String c = st.toString();
-			st.nextToken();
-			
-			//Check the character c, if it is a blank space ignore it, if it is ')' we're finished with this process
-			//return it, otherwise add it to the process array.  The array temporarily contains process information.
-			switch(c.toCharArray()[0]){
-				case ' ': continue;
-				case ')': return newProcess;
-				default: processArray[i] = Integer.parseInt(c); 
-			}
+			String token = st.nextToken();			
+			processData[i] = Integer.parseInt(token); 
 			
 			switch(i){
-				case 0: newProcess.setArrivalTime(processArray[0]); break;
-				case 1:	newProcess.setBurstNumber(processArray[1]); break;
-				case 2:	newProcess.setTotalCPUNeeded(processArray[2]); break;
-				case 3:	newProcess.setIONumber(processArray[3]); break;
+				case 0: newProcess.setArrivalTime(processData[0]); break;
+				case 1:	newProcess.setBurstNumber(processData[1]); break;
+				case 2:	newProcess.setTotalCPUNeeded(processData[2]); break;
+				case 3:	newProcess.setIONumber(processData[3]); break;
 			}
-			
-			i++;
 		}
-		return null;
+		return newProcess;
 	}
 }
