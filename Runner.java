@@ -2,7 +2,6 @@ package scheduler;
 import java.util.PriorityQueue; 
 import java.util.StringTokenizer;
 import java.io.*;
-import java.nio.CharBuffer;
 
 /**
  * @author yeison
@@ -51,17 +50,21 @@ public class Runner {
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		System.out.println("Number of Processes: " + numberOfProcesses);
 		//Use that value to make an array of the appropriate size to hold our Process objects.
-		Process[] processArray = new Process[numberOfProcesses];
 		
 		for(int i = 0; i < numberOfProcesses; i++){
 			Process newProcess = makeProcess(st);
 			processQueue.offer(newProcess);
 		}
-			
-		for(int i = 1; i <= processArray.length; i++){
-			processArray[i-1] = processQueue.poll();
-			System.out.println("Process " + i + " arrival time: " + processArray[i-1].arrivalTime);
+		
+		Process[] pArray = new Process[numberOfProcesses];
+		for(int i = 0; i < pArray.length; i++){
+			pArray[i] = processQueue.poll();
+			System.out.println("Process " + i + ":\n" + 
+					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + " " + pArray[i].burstNumber + " " + 
+					pArray[i].totalCPUNeeded + " " + pArray[i].IONumber + ")");
 		}
+		
+	
 		
 		// TODO Auto-generated method stub
 	}
