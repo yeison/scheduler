@@ -69,6 +69,9 @@ public class Runner {
 		algo.runCycle();
 		algo.runCycle();
 		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
 		
 		
 		System.out.println();
