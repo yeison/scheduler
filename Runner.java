@@ -67,6 +67,9 @@ public class Runner {
 		
 		algo.runCycle();
 		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		
 		
 		System.out.println();
 		for(int i = 0; i < pArray.length; i++){

@@ -10,13 +10,13 @@ public class Process implements Comparable<Process>{
 	
 	int state;
 
-	final int UNSTARTED = 0;
-	final int READY = 1;
-	final int RUNNING = 2;
-	final int BLOCKED = 3;
-	final int TERMINATED = 4;
+	final static int UNSTARTED = 0;
+	final static int READY = 1;
+	final static int RUNNING = 2;
+	final static int BLOCKED = 3;
+	final static int TERMINATED = 4;
 	
-	private int timeWaiting;
+	int timeWaiting;
 	
 	public Process(){
 		this(0, 0, 0, 0);
@@ -31,8 +31,8 @@ public class Process implements Comparable<Process>{
 		remainingBurst = 0;
 	}
 	
-	void startBurst(){
-		remainingBurst = burstNumber; 
+	void setRemainingBurst(int burst){
+		remainingBurst = burst; 
 	}
 	void reduceBurst(){
 		remainingBurst--;
@@ -42,8 +42,8 @@ public class Process implements Comparable<Process>{
 		switch(state){
 			case UNSTARTED: break;
 			case READY: timeWaiting++; break;
-			case RUNNING: startBurst();
-			case BLOCKED: break;
+			case RUNNING: setRemainingBurst(burstNumber); break;
+			case BLOCKED: setRemainingBurst(IONumber); break;
 			case TERMINATED: break;
 		}
 		
@@ -74,6 +74,10 @@ public class Process implements Comparable<Process>{
 	void setBurstNumber(int b) {
 		this.burstNumber =  b;// TODO Auto-generated method stub
 		
+	}
+	
+	void resetBurst(){
+		remainingBurst = this.burstNumber;
 	}
 
 	void setArrivalTime(int a) {
