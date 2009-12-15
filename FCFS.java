@@ -1,14 +1,30 @@
 package scheduler;
-import java.util.Queue;
+import java.util.PriorityQueue;
 
 public class FCFS {
-	Queue<Process> processQueue;
+	PriorityQueue<Process> processQueue = new PriorityQueue<Process>();
+	int cycle;
 	
-	FCFS(Process p){
-		processQueue.add(p);
+	FCFS(){
+		this.cycle = 0;
 	}
 	
-	public void addProcess(Process p){
-		processQueue.add(p);
+	public void qProcess(Process p){
+		processQueue.offer(p);
 	}
+	
+	public void runCycle(){
+		Process currentProcess;
+		String cycleLine = "";
+		
+		while((currentProcess = processQueue.poll()) != null){
+			cycleLine += "\t" + currentProcess.getStateString() + " " + currentProcess.remainingBurst;
+		}
+		
+		System.out.println("Before cycle " + this.cycle + ": " + cycleLine);
+		
+		
+		this.cycle++;
+	}
+			
 }

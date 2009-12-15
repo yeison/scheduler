@@ -8,6 +8,7 @@ import java.io.*;
  *
  */
 public class Runner {
+	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
 	/**
 	 * @param args
@@ -49,16 +50,26 @@ public class Runner {
 		//Properly formatted input starts with the number of processes.
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		System.out.println("Number of Processes: " + numberOfProcesses);
-		//Use that value to make an array of the appropriate size to hold our Process objects.
-		
+	
+		/*Make processes from the input and place them into priority queues.  The processes are
+		 * sorted based on their delays.  A process with a high delay will be at the end of the queue.*/ 
 		for(int i = 0; i < numberOfProcesses; i++){
 			Process newProcess = makeProcess(st);
 			processQueue.offer(newProcess);
 		}
-		
+
+		FCFS algo = new FCFS();
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
+			algo.qProcess(pArray[i]);
+		}
+		
+		algo.runCycle();
+		algo.runCycle();
+		
+		System.out.println();
+		for(int i = 0; i < pArray.length; i++){
 			System.out.println("Process " + i + ":\n" + 
 					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + " " + pArray[i].burstNumber + " " + 
 					pArray[i].totalCPUNeeded + " " + pArray[i].IONumber + ")");

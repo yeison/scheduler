@@ -6,8 +6,10 @@ public class Process implements Comparable<Process>{
 	int burstNumber; //B
 	int totalCPUNeeded; //C
 	int IONumber; //IO
+	int remainingBurst;
 	
 	int state;
+
 	final int UNSTARTED = 0;
 	final int READY = 1;
 	final int RUNNING = 2;
@@ -26,18 +28,37 @@ public class Process implements Comparable<Process>{
 		setTotalCPUNeeded(C);
 		setIONumber(IO);
 		timeWaiting = 0;
+		remainingBurst = 0;
+	}
+	
+	void startBurst(){
+		remainingBurst = burstNumber; 
+	}
+	void reduceBurst(){
+		remainingBurst--;
 	}
 
 	void setState(int state){
 		switch(state){
 			case UNSTARTED: break;
 			case READY: timeWaiting++; break;
-			case RUNNING: break;
+			case RUNNING: startBurst();
 			case BLOCKED: break;
 			case TERMINATED: break;
 		}
 		
 		this.state = state;
+	}
+	
+	public String getStateString() {
+		switch(this.state){
+			case UNSTARTED: return "unstarted";
+			case READY: return "ready";
+			case RUNNING: return "running";
+			case BLOCKED: return "blocked";
+			case TERMINATED: return "terminated";
+			default: return null;
+		}
 	}
 	
 	void setIONumber(int IO) {
