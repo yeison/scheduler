@@ -1,10 +1,11 @@
 package scheduler;
 import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingQueue;
+//import java.util.concurrent.LinkedBlockingQueue;
 
 public class FCFS {
 	LinkedList<Process> processQ = new LinkedList<Process>();
-	LinkedBlockingQueue<Process> blockingQ = new LinkedBlockingQueue<Process>();
+	LinkedList<Process> readyQ = new LinkedList<Process>();
+	LinkedList<Process> blockingQ = new LinkedList<Process>();
 	LinkedList<Process> printQ = new LinkedList<Process>();
 	Process runningProcess = null;
 	int cycle;
@@ -19,14 +20,27 @@ public class FCFS {
 	}
 	
 	public void runCycle(){
-		LinkedList<Process> processQCopy = new LinkedList<Process>();
-		LinkedList<Process> printQCopy = new LinkedList<Process>();
+		//Make a copy of the print queue.
+		
+		printCycle();
+		
+		this.processQ = checkArrival();
+		
+		checkReadyToRun();
+		
+		checkRunToBlock();
+		
+		this.blockingQ = checkBlockToReady();
+		
+		checkReadyToRun();
+		
+		this.cycle++;
+	}
+	
+	public void printCycle(){
 		Process currentProcess;
 		String cycleLine = "";
-		//Make a copy of the process queue.
-		blockingQ = new LinkedBlockingQueue<Process>(processQ);
-		//Make a copy of the print queue.
-		printQCopy = new LinkedList<Process>(printQ);
+		LinkedList<Process> printQCopy = new LinkedList<Process>(printQ);
 		
 		//Print the print queue.
 		while((currentProcess = printQ.poll()) != null){
@@ -35,50 +49,62 @@ public class FCFS {
 		//Restore the print queue from its copy.
 		printQ = new LinkedList<Process>(printQCopy);
 		
-		
 		System.out.println("Before cycle " + this.cycle + ": " + cycleLine);
-		
+	}
+	
+	public LinkedList<Process> checkArrival(){
+		LinkedList<Process> processQ = new LinkedList<Process>();
+		Process currentProcess;
 		//If the processes' time has arrived, set the process to ready.
-		while((currentProcess = blockingQ.poll()) != null){
-			if((currentProcess.arrivalTime - this.cycle) == 0)
+		while((currentProcess = this.processQ.poll()) != null){
+			if((currentProcess.arrivalTime - this.cycle) == 0){
 				currentProcess.setState(Process.READY);
-		}
-		
-		
-		blockingQ = new LinkedBlockingQueue<Process>(processQ);
-		currentProcess = blockingQ.peek(); 
-		if(currentProcess != null && currentProcess.state == Process.READY && runningProcess == null){
-			currentProcess = processQ.poll();
-			try {
-				runningProcess = blockingQ.take();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				readyQ.offer(currentProcess);
 			}
-			runningProcess.setState(Process.RUNNING);
 			processQ.offer(currentProcess);
 		}
-		
-		while((currentProcess = processQ.poll()) != null){
-			if(currentProcess.state == Process.RUNNING){
+		return processQ;
+	}
+	
+	public void checkReadyToRun(){
+		Process currentProcess = this.readyQ.peek(); 
+		if(currentProcess != null && currentProcess.state == Process.READY && runningProcess == null){
+			runningProcess = this.readyQ.poll();
+			runningProcess.setState(Process.RUNNING);
+		}
+	}
+	
+	public void checkRunToBlock(){
+		if(runningProcess.state == Process.RUNNING){
+			if(runningProcess.remainingBurst > 1){
+				runningProcess.reduceBurst();
+			}
+			else{
+				runningProcess.setState(Process.BLOCKED);
+				this.blockingQ.offer(runningProcess);
+				this.processQ.offer(runningProcess);
+				runningProcess = null;
+			}
+		}
+	}
+	
+	public LinkedList<Process> checkBlockToReady(){
+		Process currentProcess;
+		LinkedList<Process> blockingQ = new LinkedList<Process>();
+		while(this.blockingQ.peek() != null){
+			currentProcess = this.blockingQ.poll();
+			if(currentProcess.state == Process.BLOCKED){
 				if(currentProcess.remainingBurst > 1){
 					currentProcess.reduceBurst();
+					blockingQ.offer(currentProcess);
 				}
 				else{
-					currentProcess.setState(Process.BLOCKED);
-					try {
-						blockingQ.put(currentProcess);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					runningProcess = null;
+					currentProcess.reduceBurst();
+					currentProcess.setState(Process.READY);
+					this.readyQ.offer(currentProcess);
 				}
 			}
-			processQCopy.offer(currentProcess);
 		}
-		processQ = new LinkedList<Process>(processQCopy);
-		this.cycle++;
+		return blockingQ;
 	}
-			
 }
