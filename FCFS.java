@@ -7,8 +7,12 @@ public class FCFS {
 	LinkedList<Process> readyQ = new LinkedList<Process>();
 	LinkedList<Process> blockingQ = new LinkedList<Process>();
 	LinkedList<Process> printQ = new LinkedList<Process>();
+	LinkedList<Process> nextProcessQ = new LinkedList<Process>();
+	LinkedList<Process> nextReadyQ = new LinkedList<Process>();
+	LinkedList<Process> nextBlockingQ = new LinkedList<Process>();
 	Process runningProcess = null;
 	int cycle;
+	
 	
 	FCFS(){
 		this.cycle = 0;
@@ -19,22 +23,21 @@ public class FCFS {
 		processQ = new LinkedList<Process>(printQ);
 	}
 	
-	public void runCycle(){
-		//Make a copy of the print queue.
-		
+	public void runCycle(){	
 		printCycle();
 		
-		this.processQ = checkArrival();
+		checkArrival();
 		
 		checkReadyToRun();
 		
 		checkRunToBlock();
 		
-		this.blockingQ = checkBlockToReady();
-		
-		checkReadyToRun();
-		
+		nextBlockingQ = checkBlockToReady();
+				
 		this.cycle++;
+		this.blockingQ = nextBlockingQ;
+		this.readyQ = nextReadyQ;
+		this.processQ = nextProcessQ;
 	}
 	
 	public void printCycle(){
@@ -52,18 +55,17 @@ public class FCFS {
 		System.out.println("Before cycle " + this.cycle + ": " + cycleLine);
 	}
 	
-	public LinkedList<Process> checkArrival(){
-		LinkedList<Process> processQ = new LinkedList<Process>();
+	public void checkArrival(){
 		Process currentProcess;
 		//If the processes' time has arrived, set the process to ready.
 		while((currentProcess = this.processQ.poll()) != null){
 			if((currentProcess.arrivalTime - this.cycle) == 0){
 				currentProcess.setState(Process.READY);
-				readyQ.offer(currentProcess);
+				nextReadyQ.offer(currentProcess);
 			}
-			processQ.offer(currentProcess);
+			else
+				nextProcessQ.offer(currentProcess);
 		}
-		return processQ;
 	}
 	
 	public void checkReadyToRun(){
@@ -75,14 +77,13 @@ public class FCFS {
 	}
 	
 	public void checkRunToBlock(){
-		if(runningProcess.state == Process.RUNNING){
-			if(runningProcess.remainingBurst > 1){
+		if(runningProcess != null){
+			if(runningProcess.remainingBurst > 1)
 				runningProcess.reduceBurst();
-			}
 			else{
 				runningProcess.setState(Process.BLOCKED);
-				this.blockingQ.offer(runningProcess);
-				this.processQ.offer(runningProcess);
+				nextBlockingQ.offer(runningProcess);
+				nextProcessQ.offer(runningProcess);
 				runningProcess = null;
 			}
 		}
@@ -101,7 +102,7 @@ public class FCFS {
 				else{
 					currentProcess.reduceBurst();
 					currentProcess.setState(Process.READY);
-					this.readyQ.offer(currentProcess);
+					nextReadyQ.offer(currentProcess);
 				}
 			}
 		}
