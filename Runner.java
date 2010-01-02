@@ -51,7 +51,7 @@ public class Runner {
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		System.out.println("Number of Processes: " + numberOfProcesses);
 	
-		/*Make processes from the input and place them into priority queues.  The processes are
+		/* Make processes from the input and place them into priority queues.  The processes are
 		 * sorted based on their delays.  A process with a high delay will be at the end of the queue.*/ 
 		for(int i = 0; i < numberOfProcesses; i++){
 			Process newProcess = makeProcess(st);
@@ -62,16 +62,16 @@ public class Runner {
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
-			algo.qProcess(pArray[i]);
+			//algo.qProcess(pArray[i]);
 		}
 		
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
+		//algo.runCycle();
 		
 		
 		System.out.println();
+		/* Extract and reformat the contents of the processes for printing.  Print each process in priority
+		 * order.
+		 */
 		for(int i = 0; i < pArray.length; i++){
 			System.out.println("Process " + i + ":\n" + 
 					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + " " + pArray[i].burstNumber + " " + 

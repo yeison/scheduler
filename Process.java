@@ -7,6 +7,7 @@ public class Process implements Comparable<Process>{
 	int totalCPUNeeded; //C
 	int IONumber; //IO
 	int remainingBurst;
+	int remainingCPU;
 	
 	int state;
 
@@ -29,13 +30,19 @@ public class Process implements Comparable<Process>{
 		setIONumber(IO);
 		timeWaiting = 0;
 		remainingBurst = 0;
+		remainingCPU = totalCPUNeeded;
 	}
 	
 	void setRemainingBurst(int burst){
 		remainingBurst = burst; 
 	}
+	
 	void reduceBurst(){
 		remainingBurst--;
+	}
+	
+	void reduceCPU(){
+		remainingCPU--;
 	}
 
 	void setState(int state){
