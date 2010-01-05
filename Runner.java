@@ -58,29 +58,16 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		FCFS algo = new FCFS();
+		FCFS algo = new FCFS(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
 			algo.offer(pArray[i]);
 		}
 		
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
-		algo.runCycle();
+		while(!algo.isFinished())
+			algo.runCycle();
+		
 		
 		
 		System.out.println();

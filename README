@@ -1,1 +1,3 @@
-Cycle 0 is a null cycle.  Nothing occurs until after cycle 1 proper begins.
+NOTE: In the verbose output, the numbers to the right of the process-state indicate the state of that process before it enters the next cycle, and the number of cycles remaining before the process leaves that state.  Therefore, for the first input file there will be 0s next to every state since the process has already run 1 cycle of the corresponding state at the time of output.
+
+Processing begins at cycle 0.  Before cycle 0 the process is unstarted, during cycle 0 the first run of the first process takes place.

@@ -10,10 +10,14 @@ public class FCFS {
 	private int cycle;
 	//A semaphore for the processor.
 	private boolean unlocked;
+	private boolean unlockNextCycle;
+	int numberTerminated = 0;
+	int numberOfProcesses;
 	
-	public FCFS(){
+	public FCFS(int numberOfProcesses){
 		cycle = 0;
 		unlocked = true;
+		this.numberOfProcesses = numberOfProcesses;
 	}
 	
 	public void offer(Process newProcess){
@@ -37,10 +41,12 @@ public class FCFS {
 				case Process.READY: checkReadyToRun(currentProcess); break;
 				case Process.RUNNING: checkRunningToBlock(currentProcess); break;
 				case Process.BLOCKED: checkBlockedToReady(currentProcess); break;
-				//case Process.TERMINATED: ;
+				case Process.TERMINATED: processQ.offer(currentProcess); break;
 			}
 		}
 		cycle++;
+		if(unlockNextCycle)
+			unlocked = true;
 	}
 	
 	public void checkArrivalOf(Process currentProcess){
@@ -58,19 +64,25 @@ public class FCFS {
 			processQ.offer(currentProcess);
 	}
 	
-	public void checkReadyToRun(Process currentProcess){
+	public boolean checkReadyToRun(Process currentProcess){
 		//Simple method checks if a process is running before running the new process.
 		if(unlocked){
 			currentProcess.setState(Process.RUNNING);
+			unlocked = false;
 			currentProcess.reduceBurst();
+			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
 			//Lock the semaphore.
-			unlocked = false;
+			if(currentProcess.remainingBurst == 0)
+				unlockNextCycle = true;
+			return true;
 		}
 		else
 			processQ.offer(currentProcess);
+			return false;
 	}
 	
+
 	public void checkRunningToBlock(Process currentProcess){
 		if(currentProcess.remainingBurst > 1){ // >1 or >0?  Come back and check this later
 			currentProcess.reduceBurst();
@@ -81,6 +93,7 @@ public class FCFS {
 			//No more CPU time needed.  Process finished.
 			currentProcess.setState(Process.TERMINATED);
 			processQ.offer(currentProcess);
+			numberTerminated++;
 			//Unlock the semaphore
 			unlocked = true;
 		}
@@ -101,8 +114,10 @@ public class FCFS {
 			processQ.offer(currentProcess);
 		}
 		else{
+			currentProcess.reduceBurst();
 			currentProcess.setState(Process.READY);
-			processQ.offer(currentProcess);
+			if(checkReadyToRun(currentProcess))
+				return;
 		}		
 	}
 	
@@ -118,5 +133,13 @@ public class FCFS {
 		//Restore the print queue from its copy.
  
 		System.out.println("Before cycle " + this.cycle + ": " + cycleLine);
+	}
+	
+	//Indicates that all processes have finished running.
+	public boolean isFinished(){
+		if(numberTerminated == numberOfProcesses)
+			return true;
+		else
+			return false;
 	}
 }
