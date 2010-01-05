@@ -62,10 +62,25 @@ public class Runner {
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
-			//algo.qProcess(pArray[i]);
+			algo.offer(pArray[i]);
 		}
 		
-		//algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
+		algo.runCycle();
 		
 		
 		System.out.println();

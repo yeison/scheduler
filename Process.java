@@ -9,6 +9,9 @@ public class Process implements Comparable<Process>{
 	int remainingBurst;
 	int remainingCPU;
 	
+	int finishingTime, turnAroundTime, IOTime, waitingTime;
+	
+	
 	int state;
 
 	final static int UNSTARTED = 0;
@@ -30,7 +33,8 @@ public class Process implements Comparable<Process>{
 		setIONumber(IO);
 		timeWaiting = 0;
 		remainingBurst = 0;
-		remainingCPU = totalCPUNeeded;
+		
+		finishingTime = turnAroundTime = IOTime = waitingTime = 0;
 	}
 	
 	void setRemainingBurst(int burst){
@@ -75,7 +79,7 @@ public class Process implements Comparable<Process>{
 
 	void setTotalCPUNeeded(int c) {
 		this.totalCPUNeeded = c;// TODO Auto-generated method stub
-		
+		this.remainingCPU = c;
 	}
 
 	void setBurstNumber(int b) {
