@@ -13,6 +13,14 @@ public class FCFS {
 	private boolean unlockNextCycle;
 	int numberTerminated = 0;
 	int numberOfProcesses;
+<<<<<<< HEAD
+=======
+	int quantum;
+	int type;
+	final static int QUANTUM_NUMBER = 2;
+	final static int FCFS = 0;
+	final static int RR = 1;
+>>>>>>> c783e4675b97edbc3a99c361644b359c97c963a5
 	
 	public FCFS(int numberOfProcesses){
 		cycle = 0;
@@ -20,6 +28,16 @@ public class FCFS {
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	
+<<<<<<< HEAD
+=======
+	public FCFS(int numberOfProcesses, int type){
+		this(numberOfProcesses);
+		if(type == RR){
+			quantum = QUANTUM_NUMBER;
+			this.type = type;
+		}
+	}
+>>>>>>> c783e4675b97edbc3a99c361644b359c97c963a5
 	
 	public void offer(Process newProcess){
 		processQ.offer(newProcess);
@@ -143,4 +161,15 @@ public class FCFS {
 			return false;
 	}
 	
+<<<<<<< HEAD
+=======
+	private boolean quantumAvailable(){
+		quantum--;
+		if(quantum < 1){
+			quantum = QUANTUM_NUMBER; //reset quantum
+			return false;
+		}
+		return true;
+	}
+>>>>>>> c783e4675b97edbc3a99c361644b359c97c963a5
 }

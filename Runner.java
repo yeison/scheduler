@@ -25,7 +25,11 @@ public class Runner {
 		 *
 		 */
 		if(args.length < 1){
+<<<<<<< HEAD
 			System.out.println("\tUsage: scheduler <input file> \n\tPlease provide the name of an input file as an argument.");
+=======
+			System.out.println("\tUsage: scheduler <input file> \n\tProvide the name of an input file as an argument");
+>>>>>>> c783e4675b97edbc3a99c361644b359c97c963a5
 			System.exit(0);
 		}
 		
