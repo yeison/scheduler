@@ -1,3 +1,4 @@
+package scheduler;
 import java.lang.Comparable;
 
 public class Process implements Comparable<Process>{
