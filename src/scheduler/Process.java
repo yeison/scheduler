@@ -15,6 +15,7 @@ public class Process implements Comparable<Process>{
 	int IONumber; //IO
 	int remainingBurst;
 	int remainingCPU;
+	int order;
 	
 	int finishingTime, turnAroundTime, IOTime, waitingTime;
 	
@@ -114,10 +115,17 @@ public class Process implements Comparable<Process>{
 	 * @param other - The process to be compared to this one.
 	 */
 	public int compareTo(Process other){
+		//If this process arrived earlier, return -1.
 		if(this.getArrivalTime() < other.getArrivalTime())
 			return -1;
-		else if(this.getArrivalTime() == other.getArrivalTime())
-			return 0;
+		//If this processes arrived at the same time as the other process...
+		else if(this.getArrivalTime() == other.getArrivalTime()){
+			//then sort by the order of input.
+			if(this.order < other.order)
+				return -1;
+			return 1;
+		}
+		//If this process arrived later, return a 1.
 		else
 			return 1;
 	}

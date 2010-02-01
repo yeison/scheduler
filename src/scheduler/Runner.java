@@ -10,6 +10,7 @@ import java.io.*;
 public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
+	static int processOrder = 0;
 	/**
 	 * @param args
 	 */
@@ -108,6 +109,8 @@ public class Runner {
 				case 3:	newProcess.setIONumber(processData[3]); break;
 			}
 		}
+		newProcess.order = processOrder;
+		processOrder++;
 		return newProcess;
 	}
 }
