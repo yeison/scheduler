@@ -1,6 +1,13 @@
 package scheduler;
 import java.lang.Comparable;
 
+
+/**
+ * A Comparable class of objects, that may be easily sorted by their time of
+ * arrival.
+ * @author yeison
+ *
+ */
 public class Process implements Comparable<Process>{
 	int arrivalTime; //A
 	int burstNumber; //B
@@ -73,17 +80,17 @@ public class Process implements Comparable<Process>{
 	}
 	
 	void setIONumber(int IO) {
-		this.IONumber = IO;// TODO Auto-generated method stub
+		this.IONumber = IO;
 		
 	}
 
 	void setTotalCPUNeeded(int c) {
-		this.totalCPUNeeded = c;// TODO Auto-generated method stub
+		this.totalCPUNeeded = c;
 		this.remainingCPU = c;
 	}
 
 	void setBurstNumber(int b) {
-		this.burstNumber =  b;// TODO Auto-generated method stub
+		this.burstNumber =  b;
 		
 	}
 	
@@ -92,7 +99,7 @@ public class Process implements Comparable<Process>{
 	}
 
 	void setArrivalTime(int a) {
-		this.arrivalTime = a;// TODO Auto-generated method stub
+		this.arrivalTime = a;
 		
 	}
 	
@@ -100,6 +107,12 @@ public class Process implements Comparable<Process>{
 		return this.arrivalTime;
 	}
 	
+	
+	/**
+	 * The method below needs to be implemented for comparables.
+	 * We want to order the objects by their time of arrival.
+	 * @param other - The process to be compared to this one.
+	 */
 	public int compareTo(Process other){
 		if(this.getArrivalTime() < other.getArrivalTime())
 			return -1;

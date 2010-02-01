@@ -21,12 +21,12 @@ public class Runner {
 		String delimeter = " \t\n\r\f()";
 		//inputBuffer.allocate(MAX_FILE_CHARS);
 		
-		/* Remember to make the first argument the argument for the algorithm to use 
-		 *
+		/* Remember to make the first argument the argument for the algorithm to
+		 * use. 
 		 */
 		if(args.length < 1){
-			System.out.println("\tUsage: scheduler <input file> \n\tPlease provide the name of an input file as an argument.");
-			System.out.println("\tUsage: scheduler <input file> \n\tProvide the name of an input file as an argument");
+			System.out.println("\tUsage: scheduler <input file> \n\tPlease " +
+					"provide the name of an input file as an argument.");
 			System.exit(0);
 		}
 		
@@ -52,8 +52,9 @@ public class Runner {
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		System.out.println("Number of Processes: " + numberOfProcesses);
 	
-		/* Make processes from the input and place them into priority queues.  The processes are
-		 * sorted based on their delays.  A process with a high delay will be at the end of the queue.*/ 
+		/* Make processes from the input and place them into priority queues.  
+		 * The processes are sorted based on their delays.  A process with a 
+		 * high delay will be at the end of the queue.*/ 
 		for(int i = 0; i < numberOfProcesses; i++){
 			Process newProcess = makeProcess(st);
 			processQueue.offer(newProcess);
@@ -72,8 +73,8 @@ public class Runner {
 		
 		
 		System.out.println();
-		/* Extract and reformat the contents of the processes for printing.  Print each process in priority
-		 * order.
+		/* Extract and reformat the contents of the processes for printing. 
+		 * Print each process in priority order.
 		 */
 		for(int i = 0; i < pArray.length; i++){
 			System.out.println("Process " + i + ":\n" + 
@@ -82,14 +83,13 @@ public class Runner {
 		}
 		
 	
-		
-		// TODO Auto-generated method stub
 	}
 	
-	/*The method below takes a StringTokenizer and reads the next four tokens from that tokenizer.  
-	 * The tokens will be interpreted as A B C and IO, respectively.  Using this data, the method
-	 * instantiates and returns a Process object.*/
-	/**
+	/**The method below takes a StringTokenizer and reads the next four tokens 
+	 * from that tokenizer.  The tokens will be interpreted as A B C and IO, 
+	 * respectively.  Using this data, the method instantiates and returns a 
+	 * Process object.
+	 * 
 	 * @param st - A string tokenizer whose next four tokens correspond to A B C and IO.
 	 * @return A new process object created from the data in the string tokenizer.
 	 */
