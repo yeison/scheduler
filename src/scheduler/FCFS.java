@@ -121,6 +121,7 @@ public class FCFS {
 			currentProcess.reduceBurst();
 			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
+			unlocked = false; //Assure that the processor is locked.
 		}
 		else if(currentProcess.remainingCPU < 1){
 			//No more CPU time needed.  Process finished.
