@@ -6,6 +6,7 @@ public class FCFS {
 	/**@param processQ - Contains the processes in the order of their delays, and the order they were encountered.
 	 * @param cycle - The current cycle of this set of process executions.**/
 	LinkedList<Process> processQ = new LinkedList<Process>();
+	LinkedList<Process> readyQ = new LinkedList<Process>();
 	LinkedList<Process> tempQ;
 	private int cycle;
 	//A semaphore for the processor.
@@ -51,10 +52,13 @@ public class FCFS {
 	}
 	
 	public void checkArrivalOf(Process currentProcess){
-		//If the processes' time has arrived, set the process to ready.  If not, place back into the queue.
+		/*If the processes' time has arrived, set the process to ready.  If not, 
+		 *place back into the queue.*/
 		if((currentProcess.arrivalTime - this.cycle) == 0){
 			currentProcess.setState(Process.READY);
-			//If this process is ready, and the semaphore is unlocked, then go ahead and run it.
+			readyQ.offer(currentProcess);
+			/*If this process is ready, and the semaphore is unlocked, then go 
+			 * ahead and run it.*/
 			if(unlocked){
 				checkReadyToRun(currentProcess);
 				return;
@@ -68,15 +72,17 @@ public class FCFS {
 	public boolean checkReadyToRun(Process currentProcess){
 		//Simple method checks if a process is running before running the new process.
 		if(unlocked){
-			currentProcess.setState(Process.RUNNING);
-			unlocked = false;
-			currentProcess.reduceBurst();
-			currentProcess.reduceCPU();
-			processQ.offer(currentProcess);
-			//Lock the semaphore.
-			if(currentProcess.remainingBurst == 0)
-				unlockNextCycle = true;
-			return true;
+			if(currentProcess.equals(readyQ.peek())){
+				currentProcess.setState(Process.RUNNING);
+				unlocked = false;
+				currentProcess.reduceBurst();
+				currentProcess.reduceCPU();
+				processQ.offer(currentProcess);
+				//Lock the semaphore.
+				if(currentProcess.remainingBurst == 0)
+					unlockNextCycle = true;
+				return true;
+			}
 		}
 		else
 			processQ.offer(currentProcess);
@@ -99,6 +105,7 @@ public class FCFS {
 			unlocked = true;
 		}
 		else{//Burst time has run out, block this process.
+			readyQ.poll();
 			currentProcess.setState(Process.BLOCKED);
 			currentProcess.reduceBurst();
 			//Reset the burst for this process.
@@ -128,11 +135,12 @@ public class FCFS {
  
 		//Print the print queue.
 		while((currentProcess = printQ.poll()) != null){
-			cycleLine += " \t" + currentProcess.getStateString() + " " + currentProcess.remainingBurst;
+			cycleLine += " \t" + currentProcess.getStateString() + " " 
+			+ currentProcess.remainingBurst;
 		}
 		//Restore the print queue from its copy.
  
-		System.out.println("Before cycle " + this.cycle + ": " + cycleLine);
+		System.out.println("Before cycle " + cycle + ": " + cycleLine);
 	}
 	
 	//Indicates that all processes have finished running.
