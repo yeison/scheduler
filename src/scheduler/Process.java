@@ -5,7 +5,7 @@ import java.lang.Comparable;
 /**
  * A Comparable class of objects, that may be easily sorted by their time of
  * arrival.
- * @author yeison
+ * @author Yeison Rodriguez
  *
  */
 public class Process implements Comparable<Process>{
@@ -17,11 +17,17 @@ public class Process implements Comparable<Process>{
 	int burstDuration;
 	int remainingCPU;
 	int order;
+	int priorityRatio = 0;
+	
 	
 	int finishingTime, turnAroundTime, IOTime, waitingTime;
 	
 	
 	int state;
+	static int cycle;
+	static int processInstances = 0;
+	private int processInstance;
+	static Process runningProcess;
 
 	final static int UNSTARTED = 0;
 	final static int READY = 1;
@@ -29,7 +35,6 @@ public class Process implements Comparable<Process>{
 	final static int BLOCKED = 3;
 	final static int TERMINATED = 4;
 	
-	int timeWaiting;
 	
 	public Process(){
 		this(0, 0, 0, 0);
@@ -40,11 +45,11 @@ public class Process implements Comparable<Process>{
 		setBurstNumber(B);
 		setTotalCPUNeeded(C);
 		setIONumber(IO);
-		timeWaiting = 0;
 		remainingBurst = 0;
 		burstDuration = 0;
 		
 		finishingTime = turnAroundTime = IOTime = waitingTime = 0;
+		processInstance = ++processInstances;
 	}
 	
 	void setRemainingBurst(int burst){
@@ -64,10 +69,12 @@ public class Process implements Comparable<Process>{
 	void setState(int state){
 		switch(state){
 			case UNSTARTED: break;
-			case READY: timeWaiting++; break;
-			case RUNNING: setRemainingBurst(burstNumber); break;
-			case BLOCKED: setRemainingBurst(IONumber); break;
-			case TERMINATED: break;
+			case READY: waitingTime++; break;
+			case RUNNING: setRemainingBurst(burstNumber); 
+						  runningProcess = this; 
+						  break;
+			case BLOCKED: setRemainingBurst(IONumber); IOTime++; break;
+			case TERMINATED: finishingTime = cycle; break;
 		}
 		
 		this.state = state;
@@ -112,6 +119,11 @@ public class Process implements Comparable<Process>{
 		return this.arrivalTime;
 	}
 	
+	int getRatio(){
+		return
+			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
+	}
+	
 	
 	/**
 	 * The method below needs to be implemented for comparables.
@@ -133,5 +145,21 @@ public class Process implements Comparable<Process>{
 		else
 			return 1;
 	}
+	
+	public int hashCode(){
+		return this.processInstance;
+	}
+	
+	
+	
+	public boolean equals(Object obj){
+		return equals((Process)obj);
+	}
+	
+	public boolean equals(Process p){
+		return p.hashCode() == this.hashCode();
+	}
+	
+	
 		
 }

@@ -4,7 +4,7 @@ import java.util.StringTokenizer;
 import java.io.*;
 
 /**
- * @author yeison
+ * @author Yeison Rodriguez
  *
  */
 public class Runner {
@@ -61,13 +61,15 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		RR algo = new RR  (numberOfProcesses, 2);
+		SchedulingAlgo algo = new FCFS (numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
 			algo.offer(pArray[i]);
 		}
 		
+		algo.capturePrintQueue();
+		System.out.println(args[0]);
 		while(!algo.isFinished())
 			algo.runCycle();
 		
@@ -79,7 +81,11 @@ public class Runner {
 			System.out.println("Process " + i + ":\n" + 
 					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + " " + 
 					pArray[i].burstNumber + " " + pArray[i].totalCPUNeeded + 
-					" " + pArray[i].IONumber + ")");
+					" " + pArray[i].IONumber + ")" + 
+					"\n\tFinishing Time: " + pArray[i].finishingTime + 
+					"\n\tTurnaround Time: " + (pArray[i].finishingTime - pArray[i].arrivalTime) +
+					"\n\tI/O Time: " + pArray[i].IOTime +
+					"\n\tWaiting Time: " + pArray[i].waitingTime);
 		}
 		
 	
