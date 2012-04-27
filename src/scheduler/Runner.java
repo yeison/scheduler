@@ -72,7 +72,6 @@ public class Runner {
 			algo.runCycle();
 		
 		
-		
 		System.out.println();
 		/* Extract and reformat the contents of the processes for printing. 
 		 * Print each process in priority order.
