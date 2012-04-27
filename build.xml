@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project yeison-scheduler-90e52e6">
+<!--this file was created by Eclipse Runnable JAR Export Wizard-->
+<!--ANT 1.7 is required                                        -->
+<target name="create_run_jar">
+<jar destfile="/Users/yeison/Desktop/sched.jar" filesetmanifest="mergewithoutmain">
+<manifest>
+<attribute name="Main-Class" value="scheduler.Runner"/>
+<attribute name="Class-Path" value="."/>
+</manifest>
+<fileset dir="/Users/yeison/Downloads/yeison-scheduler-90e52e6/bin"/>
+</jar>
+</target>
+</project>
