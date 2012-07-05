@@ -39,9 +39,14 @@ public class SchedulingAlgo {
 		
 			switch(state){
 				case Process.UNSTARTED: checkArrivalOf(currentProcess); break;
-				case Process.READY: checkReadyToRun(currentProcess); break;
+				case Process.READY: checkReadyToRun(currentProcess); 
+				                    currentProcess.waitingTime++; 
+				                    break;
 				case Process.RUNNING: checkRunningToBlock(currentProcess); break;
-				case Process.BLOCKED: checkBlockedToReady(currentProcess); break;
+				case Process.BLOCKED: 
+					                checkBlockedToReady(currentProcess);
+					                currentProcess.IOTime++;
+					                break;
 				case Process.TERMINATED: processQ.offer(currentProcess); break;
 			}
 		}
@@ -74,6 +79,8 @@ public class SchedulingAlgo {
 	}
 	
 	public boolean checkReadyToRun(Process currentProcess){
+		
+		
 		//Simple method checks if a process is running before running the new process.
 		if(unlocked){
 			//Is this process at the head of the readyQ?
@@ -88,9 +95,7 @@ public class SchedulingAlgo {
 				//unlock the semaphore for the next cycle if this processes' burst is 1.
 				if(currentProcess.remainingBurst == 1)
 					unlockNextCycle = true;
-			} else {
-			    currentProcess.waitingTime++;
-			}
+			} 
 			processQ.offer(currentProcess);
 			return true;
 		} else

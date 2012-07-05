@@ -69,11 +69,11 @@ public class Process implements Comparable<Process>{
 	void setState(int state){
 		switch(state){
 			case UNSTARTED: break;
-			case READY: break;
+			case READY:   break;
 			case RUNNING: setRemainingBurst(burstNumber); 
 						  runningProcess = this; 
 						  break;
-			case BLOCKED: setRemainingBurst(IONumber); IOTime++; break;
+			case BLOCKED: setRemainingBurst(IONumber);  break;
 			case TERMINATED: finishingTime = cycle; break;
 		}
 		
