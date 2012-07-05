@@ -1,4 +1,6 @@
 package scheduler;
+
+import java.util.LinkedList;
 //import java.util.concurrent.LinkedBlockingQueue;
 
 public class RR extends SchedulingAlgo{
@@ -7,6 +9,7 @@ public class RR extends SchedulingAlgo{
 	public RR(int numberOfProcesses, int quantum){
 		unlocked = true;
 		this.quantum = quantum;
+		readyQ = new LinkedList<Process>();
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	
