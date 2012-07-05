@@ -79,9 +79,9 @@ public class Runner {
 		 */
 		for(int i = 0; i < pArray.length; i++){
 			System.out.println("Process " + i + ":\n" + 
-					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + " " + 
-					pArray[i].burstNumber + " " + pArray[i].totalCPUNeeded + 
-					" " + pArray[i].IONumber + ")" + 
+					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + ", " + 
+					pArray[i].burstNumber + ", " + pArray[i].totalCPUNeeded + 
+					", " + pArray[i].IONumber + ")" + 
 					"\n\tFinishing Time: " + pArray[i].finishingTime + 
 					"\n\tTurnaround Time: " + (pArray[i].finishingTime - pArray[i].arrivalTime) +
 					"\n\tI/O Time: " + pArray[i].IOTime +

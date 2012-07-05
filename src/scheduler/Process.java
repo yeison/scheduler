@@ -69,7 +69,7 @@ public class Process implements Comparable<Process>{
 	void setState(int state){
 		switch(state){
 			case UNSTARTED: break;
-			case READY: waitingTime++; break;
+			case READY: break;
 			case RUNNING: setRemainingBurst(burstNumber); 
 						  runningProcess = this; 
 						  break;

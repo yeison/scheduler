@@ -83,16 +83,17 @@ public class SchedulingAlgo {
 				//Lock the semaphore
 				unlocked = false;
 				//Run one cycle
-				currentProcess.reduceBurst();
+				//currentProcess.reduceBurst();
 				currentProcess.reduceCPU();
 				//unlock the semaphore for the next cycle if this processes' burst is 1.
-				if(currentProcess.remainingBurst == 0)
+				if(currentProcess.remainingBurst == 1)
 					unlockNextCycle = true;
+			} else {
+			    currentProcess.waitingTime++;
 			}
 			processQ.offer(currentProcess);
 			return true;
-		}
-		else
+		} else
 			processQ.offer(currentProcess);
 		return false;
 	}
@@ -106,10 +107,10 @@ public class SchedulingAlgo {
 			//Lock the semaphore
 			unlocked = false;
 			//Run one cycle
-			readyProcess.reduceBurst();
+			//readyProcess.reduceBurst();
 			readyProcess.reduceCPU();
 			//unlock the semaphore for the next cycle if this processes' burst is 1.
-			if(readyProcess.remainingBurst == 0)
+			if(readyProcess.remainingBurst == 1)
 				unlockNextCycle = true;
 			return true;
 		}
@@ -129,7 +130,7 @@ public class SchedulingAlgo {
 			//Unlock the semaphore
 			unlocked = true;
 		}
-		else if(currentProcess.remainingBurst >= 1){
+		else if(currentProcess.remainingBurst > 1){
 			currentProcess.reduceBurst();
 			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
@@ -137,7 +138,7 @@ public class SchedulingAlgo {
 		}
 		else{//Burst time has run out, block this process.
 			currentProcess.setState(Process.BLOCKED);
-			currentProcess.reduceBurst();
+			//currentProcess.reduceBurst();
 			//Remove from the readyQ.
 			readyQ.poll();
 			processQ.offer(currentProcess);
@@ -148,16 +149,21 @@ public class SchedulingAlgo {
 	}
 	
 	public void checkBlockedToReady(Process currentProcess){
-		if(currentProcess.remainingBurst >= 1){
+		
+		if(currentProcess.remainingBurst > 1){
 			currentProcess.reduceBurst();
 			processQ.offer(currentProcess);
 		}
 		else{
+			currentProcess.reduceBurst();
 			currentProcess.setState(Process.READY);
 			//Place the process on the ready queue.  Wait its turn to run.
 			readyQ.offer(currentProcess);
 			checkReadyToRun(currentProcess);
-		}		
+		}	
+		
+		
+
 	}
 	
 	public void printCycle(){
