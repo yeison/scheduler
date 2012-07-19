@@ -1,12 +1,17 @@
 package scheduler;
 
 import java.util.LinkedList;
+import java.util.Queue;
+
 
 public class SchedulingAlgo {
+	
+	
 	/**@param processQ - Contains the processes in the order of their delays, and the order they were encountered.
 	 * @param cycle - The current cycle of this set of process executions.**/
 	LinkedList<Process> processQ = new LinkedList<Process>();
-	LinkedList<Process> readyQ;
+    // LinkedList and PriorityQueue both implement Queue
+	Queue<Process> readyQ;
 	LinkedList<Process> printQ;
 	LinkedList<Process> tempQ;
 	protected int cycle = 0;
@@ -15,6 +20,7 @@ public class SchedulingAlgo {
 	protected boolean unlockNextCycle;
 	int numberTerminated = 0;
 	int numberOfProcesses;
+	
 	
 	public void capturePrintQueue(){
 		printQ = new LinkedList<Process>(processQ);
@@ -80,11 +86,10 @@ public class SchedulingAlgo {
 	
 	public boolean checkReadyToRun(Process currentProcess){
 		
-		
 		//Simple method checks if a process is running before running the new process.
 		if(unlocked){
 			//Is this process at the head of the readyQ?
-			if(currentProcess.equals(readyQ.peek())){
+			if(readyQ.isEmpty() || currentProcess.equals(readyQ.peek())){
 				//If it is, then set this process to RUNNING, and leave it on the readyQ.
 				currentProcess.setState(Process.RUNNING);
 				//Lock the semaphore
@@ -141,7 +146,8 @@ public class SchedulingAlgo {
 			processQ.offer(currentProcess);
 			unlocked = false; //Assure that the processor is locked.
 		}
-		else{//Burst time has run out, block this process.
+		else{
+			//Burst time has run out, block this process.
 			currentProcess.setState(Process.BLOCKED);
 			//currentProcess.reduceBurst();
 			//Remove from the readyQ.
