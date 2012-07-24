@@ -3,7 +3,7 @@ import java.lang.Comparable;
 
 
 /**
- * A Comparable class of objects, that may be easily sorted by their time of
+ * A Comparable class of objects, that may be easily sorted by its time of
  * arrival.
  * @author Yeison Rodriguez
  *
@@ -24,6 +24,7 @@ public class Process implements Comparable<Process>{
 	
 	
 	int state;
+	int previousState;
 	static int cycle;
 	static int processInstances = 0;
 	private int processInstance;
@@ -45,7 +46,7 @@ public class Process implements Comparable<Process>{
 		setBurstNumber(B);
 		setTotalCPUNeeded(C);
 		setIONumber(IO);
-		remainingBurst = 0;
+		setRemainingBurst(burstNumber);
 		burstDuration = 0;
 		
 		finishingTime = turnAroundTime = IOTime = waitingTime = 0;
@@ -68,15 +69,29 @@ public class Process implements Comparable<Process>{
 
 	void setState(int state){
 		switch(state){
-			case UNSTARTED: break;
-			case READY:   break;
-			case RUNNING: setRemainingBurst(burstNumber); 
-						  runningProcess = this; 
-						  break;
-			case BLOCKED: setRemainingBurst(IONumber);  break;
-			case TERMINATED: finishingTime = cycle; break;
+			case UNSTARTED: 
+				break;
+			
+			case READY:   
+				break;
+			
+			case RUNNING: 
+				if(previousState == Process.BLOCKED || previousState == Process.UNSTARTED)
+				    setRemainingBurst(burstNumber); 
+			    
+				runningProcess = this; 
+				break;
+			
+			case BLOCKED: 
+				setRemainingBurst(IONumber);  
+				break;
+			
+			case TERMINATED: 
+				finishingTime = cycle; 
+				break;
 		}
 		
+		previousState = this.state;
 		this.state = state;
 	}
 	
@@ -102,8 +117,7 @@ public class Process implements Comparable<Process>{
 	}
 
 	void setBurstNumber(int b) {
-		this.burstNumber =  b;
-		
+		this.burstNumber =  b;		
 	}
 	
 	void resetBurst(){
@@ -137,7 +151,7 @@ public class Process implements Comparable<Process>{
 		//If this processes arrived at the same time as the other process...
 		else if(this.getArrivalTime() == other.getArrivalTime()){
 			//then sort by the order of input.
-			if(this.order < other.order)
+			if(this.processInstance < other.processInstance)
 				return -1;
 			return 1;
 		}
@@ -151,7 +165,6 @@ public class Process implements Comparable<Process>{
 	}
 	
 	
-	
 	public boolean equals(Object obj){
 		return equals((Process)obj);
 	}
@@ -159,7 +172,5 @@ public class Process implements Comparable<Process>{
 	public boolean equals(Process p){
 		return p.hashCode() == this.hashCode();
 	}
-	
-	
 		
 }

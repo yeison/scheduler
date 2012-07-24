@@ -5,11 +5,12 @@ import java.util.LinkedList;
 
 public class RR extends SchedulingAlgo{
 	private int quantum;
+	LinkedList<Process> readyQ;
 	
 	public RR(int numberOfProcesses, int quantum){
 		unlocked = true;
 		this.quantum = quantum;
-		readyQ = new LinkedList<Process>();
+		this.readyQ = new LinkedList<Process>();
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	

@@ -9,8 +9,8 @@ public class ShortestJob implements Comparator<Process>{
 			return -1;
 		else if(p1.remainingCPU > p2.remainingCPU)
 			return 1;
-		
-		return p2.compareTo(p1);
+		else	
+			return p1.compareTo(p2);
 	}
 
 }

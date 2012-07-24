@@ -61,7 +61,7 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		SchedulingAlgo algo = new FCFS (numberOfProcesses);
+		SchedulingAlgo algo = new PSJF (numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
