@@ -18,6 +18,7 @@ public class Process implements Comparable<Process>{
 	int remainingCPU;
 	int order;
 	int priorityRatio = 0;
+	boolean tampered = false;
 	
 	
 	int finishingTime, turnAroundTime, IOTime, waitingTime;
@@ -27,7 +28,7 @@ public class Process implements Comparable<Process>{
 	int previousState;
 	static int cycle;
 	static int processInstances = 0;
-	private int processInstance;
+	int processInstance;
 	static Process runningProcess;
 
 	final static int UNSTARTED = 0;
@@ -79,14 +80,15 @@ public class Process implements Comparable<Process>{
 				if(previousState == Process.BLOCKED || previousState == Process.UNSTARTED)
 				    setRemainingBurst(burstNumber); 
 			    
-				runningProcess = this; 
+				runningProcess = this;
 				break;
 			
 			case BLOCKED: 
 				setRemainingBurst(IONumber);  
 				break;
 			
-			case TERMINATED: 
+			case TERMINATED:
+				setRemainingBurst(0);
 				finishingTime = cycle; 
 				break;
 		}
@@ -138,6 +140,16 @@ public class Process implements Comparable<Process>{
 			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
 	}
 	
+	boolean checkTampered(){
+		boolean tempTampered = this.tampered;
+		this.tampered = false;
+		return tempTampered;
+	}
+	
+	void setTampered(){
+		this.tampered = true;
+	}
+	
 	
 	/**
 	 * The method below needs to be implemented for comparables.
@@ -171,6 +183,11 @@ public class Process implements Comparable<Process>{
 	
 	public boolean equals(Process p){
 		return p.hashCode() == this.hashCode();
+	}
+	
+	@Override
+	public String toString(){
+		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + ")";
 	}
 		
 }

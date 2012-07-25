@@ -42,17 +42,29 @@ public class SchedulingAlgo {
 			currentProcess = tempQ.poll();
 			state = currentProcess.state;
 		
+			if(currentProcess.checkTampered()){
+				processQ.offer(currentProcess);
+				continue;
+			}
+			
 			switch(state){
-				case Process.UNSTARTED: checkArrivalOf(currentProcess); break;
-				case Process.READY: checkReadyToRun(currentProcess); 
-				                    currentProcess.waitingTime++; 
-				                    break;
-				case Process.RUNNING: checkRunningToBlock(currentProcess); break;
-				case Process.BLOCKED: 
-					                checkBlockedToReady(currentProcess);
-					                currentProcess.IOTime++;
-					                break;
-				case Process.TERMINATED: processQ.offer(currentProcess); break;
+				case Process.UNSTARTED: 
+					checkArrivalOf(currentProcess); 
+					break;
+				case Process.READY: 
+					checkReadyToRun(currentProcess); 
+					currentProcess.waitingTime++;                 
+					break;
+				case Process.RUNNING: 
+					checkRunningToBlock(currentProcess); 
+					break;
+				case Process.BLOCKED:                 
+					checkBlockedToReady(currentProcess);
+					currentProcess.IOTime++;                
+					break;
+				case Process.TERMINATED: 
+					processQ.offer(currentProcess); 
+					break;
 			}
 		}
 		
@@ -70,7 +82,8 @@ public class SchedulingAlgo {
 		if((currentProcess.arrivalTime - this.cycle) == 0){
 			currentProcess.setState(Process.READY);
 			//Set to ready and insert into ready queue.
-			readyQ.offer(currentProcess);
+			if(!readyQ.contains(currentProcess))
+			    readyQ.offer(currentProcess);
 			/* If this process is ready, and the semaphore is unlocked, then go 
 			 * ahead and run it.  After setting to running return from this function.*/
 			if(unlocked){
@@ -175,7 +188,8 @@ public class SchedulingAlgo {
 			currentProcess.reduceBurst();
 			currentProcess.setState(Process.READY);
 			//Place the process on the ready queue.  Wait its turn to run.
-			readyQ.offer(currentProcess);
+			if(!readyQ.contains(currentProcess))
+			    readyQ.offer(currentProcess);
 			checkReadyToRun(currentProcess);
 		}		
 
