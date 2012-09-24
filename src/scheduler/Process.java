@@ -165,7 +165,8 @@ public class Process implements Comparable<Process>{
 			//then sort by the order of input.
 			if(this.processInstance < other.processInstance)
 				return -1;
-			return 1;
+			else
+			    return 1;
 		}
 		//If this process arrived later, return a 1.
 		else
@@ -187,7 +188,7 @@ public class Process implements Comparable<Process>{
 	
 	@Override
 	public String toString(){
-		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + ")";
+		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + " CPU:" + remainingCPU + ")";
 	}
 		
 }

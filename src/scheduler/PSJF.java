@@ -33,6 +33,7 @@ public class PSJF extends SchedulingAlgo {
 				//If it is, then set this process to RUNNING, and leave it on the readyQ.
 				currentProcess.setState(Process.RUNNING);
 				
+				
 				//Lock the semaphore
 				unlocked = false;
 				//Run one cycle

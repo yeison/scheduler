@@ -133,6 +133,7 @@ public class SchedulingAlgo {
 			
 			//Lock the semaphore
 			unlocked = false;
+			
 			//Run one cycle
 			//readyProcess.reduceBurst();
 			readyProcess.reduceCPU();
