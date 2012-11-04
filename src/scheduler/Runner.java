@@ -11,9 +11,11 @@ public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
 	static int processOrder = 0;
+	
 	/**
 	 * @param args
 	 */
+	
 	public static void main(String[] args) {
 		PriorityQueue<Process> processQueue = new PriorityQueue<Process>();
 		FileReader fileReader = null;
@@ -60,32 +62,36 @@ public class Runner {
 			Process newProcess = makeProcess(st);
 			processQueue.offer(newProcess);
 		}
+		
+		Process[] processArray = processQueue.toArray(new Process[0]);
 
-		SchedulingAlgo algo = new PSJF (numberOfProcesses);
-		Process[] pArray = new Process[numberOfProcesses];
-		for(int i = 0; i < pArray.length; i++){
-			pArray[i] = processQueue.poll();
-			algo.offer(pArray[i]);
-		}
+		SchedulingAlgo algo = new RR (numberOfProcesses, 1);
+		algo.offer(processQueue);
 		
 		algo.capturePrintQueue();
+		
 		System.out.println(args[0]);
-		while(!algo.isFinished())
+		
+		
+		while(!algo.isFinished()){
 			algo.runCycle();
+		}
 		
 		System.out.println();
 		/* Extract and reformat the contents of the processes for printing. 
 		 * Print each process in priority order.
 		 */
-		for(int i = 0; i < pArray.length; i++){
+		int i = 0;
+		for(Process process : processArray ){
 			System.out.println("Process " + i + ":\n" + 
-					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + ", " + 
-					pArray[i].burstNumber + ", " + pArray[i].totalCPUNeeded + 
-					", " + pArray[i].IONumber + ")" + 
-					"\n\tFinishing Time: " + pArray[i].finishingTime + 
-					"\n\tTurnaround Time: " + (pArray[i].finishingTime - pArray[i].arrivalTime) +
-					"\n\tI/O Time: " + pArray[i].IOTime +
-					"\n\tWaiting Time: " + pArray[i].waitingTime);
+					"\t(A, B, C, IO) = " + "(" + process.arrivalTime + ", " + 
+					process.burstNumber + ", " + process.totalCPUNeeded + 
+					", " + process.IONumber + ")" + 
+					"\n\tFinishing Time: " + process.finishingTime + 
+					"\n\tTurnaround Time: " + (process.finishingTime - process.arrivalTime) +
+					"\n\tI/O Time: " + process.IOTime +
+					"\n\tWaiting Time: " + process.waitingTime);
+			i++;
 		}
 		
 	
