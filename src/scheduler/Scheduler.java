@@ -20,7 +20,13 @@ public class Scheduler {
 	}
 	
 	public void runCycle(){
+		
+		
 		for(Process process : processCollection){
+			
+			process.runCycle();		
+
+			
 			System.out.println(process);
 		}
 	}

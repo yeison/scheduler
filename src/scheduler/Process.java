@@ -56,13 +56,51 @@ public class Process implements Comparable<Process>{
 		processInstance = ++processInstances;
 	}
 	
-	void reduceCpuBurst(){
+	private void reduceCpuBurst(){
 		remainingCpuBurst--;
 		currentBurstDuration++;
 	}
 	
-	void reduceCPU(){
+	private void reduceIoBurst(){
+		remainingCpuBurst--;
+		currentBurstDuration++;
+	}
+	
+	private void reduceCPU(){
 		remainingCPU--;
+	}
+	
+	void runCycle(){
+		
+		try {
+			
+			switch(this.getState()){
+			
+				case UNSTARTED: 
+					break;
+				
+				case READY:   
+					break;
+				
+				case RUNNING: 
+					this.reduceCPU();
+					this.reduceCpuBurst();
+					break;
+				
+				case BLOCKED: 
+					this.reduceIoBurst();
+					break;
+				
+				case TERMINATED:
+					break;
+			
+			}
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		
 	}
 
 	/** Setters **/
@@ -75,6 +113,7 @@ public class Process implements Comparable<Process>{
 			
 			case READY:   
 				setRemainingCpuBurst(burstNumber);
+				break;
 			
 			case RUNNING: 
 				if(previousState == Process.BLOCKED 
@@ -98,6 +137,11 @@ public class Process implements Comparable<Process>{
 		
 		previousState = this.state;
 		this.state = state;
+		
+		if(this.remainingCPU == 0){
+			this.state = Process.TERMINATED;
+		}
+		
 	}
 	
 	void setRemainingCpuBurst(int burst){
@@ -152,13 +196,13 @@ public class Process implements Comparable<Process>{
        }
     }
 	
-	public String getState() {
+	public int getState() throws Exception {
 		
 		switch(this.state){
 		
 			case UNSTARTED: 
 				if( cycle < this.arrivalTime ){
-					return "unstarted";
+					return Process.UNSTARTED;
 				} else {
 					this.setState(Process.READY);
 					return this.getState();
@@ -169,12 +213,12 @@ public class Process implements Comparable<Process>{
 					this.setState(Process.RUNNING);
 					return this.getState();
 				} else {
-					return (this.state == Process.RUNNING) ? "running":"ready";
+					return (this.state == Process.RUNNING) ? RUNNING:READY;
 				}
 				
 			case RUNNING:
 				if( this.remainingCpuBurst > 0 ){
-					return "running";
+					return Process.RUNNING;
 				} else {
 					this.setState(Process.BLOCKED);
 					return this.getState();
@@ -182,7 +226,7 @@ public class Process implements Comparable<Process>{
 				
 			case BLOCKED:
 				if( this.remainingIoBurst > 0){
-					return "blocked";
+					return Process.BLOCKED;
 				} else {
 					this.setState(Process.RUNNING);
 					return this.getState();
@@ -190,9 +234,9 @@ public class Process implements Comparable<Process>{
 				
 				
 			case TERMINATED: 
-				return "terminated";
+				return Process.TERMINATED;
 			
-			default: return null;
+			default: throw new Exception();
 		}
 		
 	}
@@ -235,10 +279,10 @@ public class Process implements Comparable<Process>{
 			return 1;
 	}
 	
+	@Override
 	public int hashCode(){
 		return this.processInstance;
 	}	
-
 	
 	public boolean equals(Process p){
 		return p.hashCode() == this.hashCode();
