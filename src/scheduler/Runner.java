@@ -1,6 +1,8 @@
 package scheduler;
-import java.util.PriorityQueue; 
+
+ 
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.io.*;
 
 /**
@@ -10,22 +12,22 @@ import java.io.*;
 public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
-	static int processOrder = 0;
+	
 	
 	/**
 	 * @param args
 	 */
 	
 	public static void main(String[] args) {
-		PriorityQueue<Process> processQueue = new PriorityQueue<Process>();
+		TreeSet<Process> processTreeSet = new TreeSet<Process>();
 		FileReader fileReader = null;
 		int numberOfProcesses = 0;
 		char inputBuffer[] = new char[MAX_FILE_CHARS];
 		String delimeter = " \t\n\r\f()";
-		//inputBuffer.allocate(MAX_FILE_CHARS);
+
 		
-		/* Remember to make the first argument the argument for the algorithm to
-		 * use. 
+		/* TODO: Remember to make the first argument the argument for the
+		 *  algorithm to use. 
 		 */
 		if(args.length < 1){
 			System.out.println("\tUsage: scheduler <input file> \n\tPlease " +
@@ -41,12 +43,14 @@ public class Runner {
 			System.err.println("Error: The file name supplied was not found.");
 			System.exit(1);
 		}
+		
 		try {
 			fileReader.read(inputBuffer);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		//st = new StreamTokenizer(fileReader);
 		String input = String.valueOf(inputBuffer);
 		StringTokenizer st = new StringTokenizer(input, delimeter);
@@ -59,29 +63,22 @@ public class Runner {
 		 * The processes are sorted based on their delays.  A process with a 
 		 * high delay will be at the end of the queue.*/ 
 		for(int i = 0; i < numberOfProcesses; i++){
-			Process newProcess = makeProcess(st);
-			processQueue.offer(newProcess);
+			Process newProcess = Process.makeProcess(st);
+			processTreeSet.add(newProcess);
 		}
 		
-		Process[] processArray = processQueue.toArray(new Process[0]);
-
-		SchedulingAlgo algo = new RR (numberOfProcesses, 1);
-		algo.offer(processQueue);
-		
-		algo.capturePrintQueue();
+		Scheduler scheduler = new Scheduler(processTreeSet);			
 		
 		System.out.println(args[0]);
 		
-		
-		while(!algo.isFinished()){
-			algo.runCycle();
-		}
+		scheduler.runCycle();	
 		
 		System.out.println();
 		/* Extract and reformat the contents of the processes for printing. 
 		 * Print each process in priority order.
 		 */
 		int i = 0;
+		Process[] processArray = processTreeSet.toArray(new Process[0]);
 		for(Process process : processArray ){
 			System.out.println("Process " + i + ":\n" + 
 					"\t(A, B, C, IO) = " + "(" + process.arrivalTime + ", " + 
@@ -97,31 +94,5 @@ public class Runner {
 	
 	}
 	
-	/**The method below takes a StringTokenizer and reads the next four tokens 
-	 * from that tokenizer.  The tokens will be interpreted as A B C and IO, 
-	 * respectively.  Using this data, the method instantiates and returns a 
-	 * Process object.
-	 * 
-	 * @param st - A string tokenizer whose next four tokens correspond to A B C and IO.
-	 * @return A new process object created from the data in the string tokenizer.
-	 */
-	static Process makeProcess(StringTokenizer st){
-		Process newProcess = new Process();
-		int[] processData = new int[4];
-		
-		for(int i = 0; i < 4; i++){
-			String token = st.nextToken();			
-			processData[i] = Integer.parseInt(token); 
-			
-			switch(i){
-				case 0: newProcess.setArrivalTime(processData[0]); break;
-				case 1:	newProcess.setBurstNumber(processData[1]); break;
-				case 2:	newProcess.setTotalCPUNeeded(processData[2]); break;
-				case 3:	newProcess.setIONumber(processData[3]); break;
-			}
-		}
-		newProcess.order = processOrder;
-		processOrder++;
-		return newProcess;
-	}
+
 }

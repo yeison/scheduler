@@ -1,9 +1,10 @@
 package scheduler;
 import java.lang.Comparable;
+import java.util.StringTokenizer;
 
 
 /**
- * A Comparable class of objects, that may be easily sorted by its time of
+ * A Comparable class of objects that may easily be sorted by its time of
  * arrival.
  * @author Yeison Rodriguez
  *
@@ -13,23 +14,24 @@ public class Process implements Comparable<Process>{
 	int burstNumber; //B
 	int totalCPUNeeded; //C
 	int IONumber; //IO
-	int remainingBurst;
-	int burstDuration;
-	int remainingCPU;
-	int order;
-	int priorityRatio = 0;
-	boolean tampered = false;
 	
-	
-	int finishingTime, turnAroundTime, IOTime, waitingTime;
-	
+	private int remainingCpuBurst;
+	private int remainingIoBurst;
+	private int currentBurstDuration;
+	private int remainingCPU;
+	private boolean tampered = false;
 	
 	int state;
 	int previousState;
 	static int cycle;
+	
+	// Keep track of other existing processes
 	static int processInstances = 0;
-	int processInstance;
+	private int processInstance;
+
 	static Process runningProcess;
+	
+	int finishingTime, turnAroundTime, IOTime, waitingTime;	
 
 	final static int UNSTARTED = 0;
 	final static int READY = 1;
@@ -37,119 +39,178 @@ public class Process implements Comparable<Process>{
 	final static int BLOCKED = 3;
 	final static int TERMINATED = 4;
 	
-	
 	public Process(){
 		this(0, 0, 0, 0);
 	}
 	
-	public Process(int A, int B, int C, int IO){
-		setArrivalTime(A);
-		setBurstNumber(B);
-		setTotalCPUNeeded(C);
+	public Process(int arrivalTime, int burstNumber, int cpu, int IO){
+		
+		setArrivalTime(arrivalTime);
+		setBurstNumber(burstNumber);
+		setTotalCPUNeeded(cpu);
 		setIONumber(IO);
-		setRemainingBurst(burstNumber);
-		burstDuration = 0;
+		
+		currentBurstDuration = 0;
 		
 		finishingTime = turnAroundTime = IOTime = waitingTime = 0;
 		processInstance = ++processInstances;
 	}
 	
-	void setRemainingBurst(int burst){
-		remainingBurst = burst;
-		burstDuration = 0;
-	}
-	
-	void reduceBurst(){
-		remainingBurst--;
-		burstDuration++;
+	void reduceCpuBurst(){
+		remainingCpuBurst--;
+		currentBurstDuration++;
 	}
 	
 	void reduceCPU(){
 		remainingCPU--;
 	}
 
+	/** Setters **/
 	void setState(int state){
+		
 		switch(state){
+		
 			case UNSTARTED: 
 				break;
 			
 			case READY:   
-				break;
+				setRemainingCpuBurst(burstNumber);
 			
 			case RUNNING: 
-				if(previousState == Process.BLOCKED || previousState == Process.UNSTARTED)
-				    setRemainingBurst(burstNumber); 
+				if(previousState == Process.BLOCKED 
+				|| previousState == Process.UNSTARTED){
+				    setRemainingCpuBurst(burstNumber); 
+				}
 			    
-				runningProcess = this;
+				Process.runningProcess = this;
 				break;
 			
 			case BLOCKED: 
-				setRemainingBurst(IONumber);  
+				setRemainingIoBurst(IONumber);  
 				break;
 			
 			case TERMINATED:
-				setRemainingBurst(0);
+				setRemainingCpuBurst(0);
 				finishingTime = cycle; 
 				break;
+				
 		}
 		
 		previousState = this.state;
 		this.state = state;
 	}
 	
-	public String getStateString() {
-		switch(this.state){
-			case UNSTARTED: return "unstarted";
-			case READY: return "ready";
-			case RUNNING: return "running";
-			case BLOCKED: return "blocked";
-			case TERMINATED: return "terminated";
-			default: return null;
-		}
+	void setRemainingCpuBurst(int burst){
+		remainingCpuBurst = burst;
+		currentBurstDuration = 0;
 	}
 	
-	void setIONumber(int IO) {
-		this.IONumber = IO;
-		
+	void setRemainingIoBurst(int burst){
+		remainingIoBurst = burst;
+	}
+	
+	private void setIONumber(int IO) {
+		this.IONumber = IO;		
 	}
 
-	void setTotalCPUNeeded(int c) {
+	private void setTotalCPUNeeded(int c) {
 		this.totalCPUNeeded = c;
 		this.remainingCPU = c;
 	}
 
-	void setBurstNumber(int b) {
+	private void setBurstNumber(int b) {
 		this.burstNumber =  b;		
 	}
 	
-	void resetBurst(){
-		remainingBurst = this.burstNumber;
-	}
-
-	void setArrivalTime(int a) {
+	private void setArrivalTime(int a) {
 		this.arrivalTime = a;
+	}
+	
+	private void setTampered(){
+		this.tampered = true;
+	}
+	
+	private void resetBurst(){
+		remainingCpuBurst = this.burstNumber;
+	}
+	
+	/** Getters **/
+	public int getProcessInstance() {
+		return processInstance;
+	}
+	
+    public String getStateString() {
+        switch(this.state){
+       
+            case UNSTARTED: return "unstarted";
+            case READY: return "ready";
+            case RUNNING: return "running";
+            case BLOCKED: return "blocked";
+            case TERMINATED: return "terminated";
+            default: return null;
+            
+       }
+    }
+	
+	public String getState() {
+		
+		switch(this.state){
+		
+			case UNSTARTED: 
+				if( cycle < this.arrivalTime ){
+					return "unstarted";
+				} else {
+					this.setState(Process.READY);
+					return this.getState();
+				}
+				
+			case READY:
+				if( Process.runningProcess == null){
+					this.setState(Process.RUNNING);
+					return this.getState();
+				} else {
+					return (this.state == Process.RUNNING) ? "running":"ready";
+				}
+				
+			case RUNNING:
+				if( this.remainingCpuBurst > 0 ){
+					return "running";
+				} else {
+					this.setState(Process.BLOCKED);
+					return this.getState();
+				}
+				
+			case BLOCKED:
+				if( this.remainingIoBurst > 0){
+					return "blocked";
+				} else {
+					this.setState(Process.RUNNING);
+					return this.getState();
+				}
+				
+				
+			case TERMINATED: 
+				return "terminated";
+			
+			default: return null;
+		}
 		
 	}
 	
-	int getArrivalTime(){
+	public int getArrivalTime(){
 		return this.arrivalTime;
 	}
 	
-	int getRatio(){
+	public int getRatio(){
 		return
 			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
 	}
 	
-	boolean checkTampered(){
+	public boolean checkTampered(){
 		boolean tempTampered = this.tampered;
 		this.tampered = false;
 		return tempTampered;
-	}
-	
-	void setTampered(){
-		this.tampered = true;
-	}
-	
+	}	
 	
 	/**
 	 * The method below needs to be implemented for comparables.
@@ -168,6 +229,7 @@ public class Process implements Comparable<Process>{
 			else
 			    return 1;
 		}
+
 		//If this process arrived later, return a 1.
 		else
 			return 1;
@@ -175,12 +237,8 @@ public class Process implements Comparable<Process>{
 	
 	public int hashCode(){
 		return this.processInstance;
-	}
-	
-	
-	public boolean equals(Object obj){
-		return equals((Process)obj);
-	}
+	}	
+
 	
 	public boolean equals(Process p){
 		return p.hashCode() == this.hashCode();
@@ -188,7 +246,42 @@ public class Process implements Comparable<Process>{
 	
 	@Override
 	public String toString(){
-		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + " CPU:" + remainingCPU + ")";
+		return "(Instance:" + this.processInstance + " State:" 
+				+ getStateString() + " Burst:" + remainingCpuBurst + " CPU:" 
+				+ remainingCPU + ")";
 	}
+	
+	/**
+	 * The method below takes a StringTokenizer and reads the next four tokens 
+	 * from that tokenizer.  The tokens will be interpreted as A B C and IO, 
+	 * respectively.  Using this data, the method instantiates and returns a 
+	 * Process object.
+	 * 
+	 * @param st - A string tokenizer whose next four tokens correspond to A B C and IO.
+	 * @return A new process object created from the data in the string tokenizer.
+	 */
+	static Process makeProcess(StringTokenizer st){
+		
+		Process newProcess = new Process();
+		int[] processData = new int[4];
+		
+		for(int i = 0; i < 4; i++){
+			String token = st.nextToken();			
+			processData[i] = Integer.parseInt(token); 
+			
+			switch(i){
+				case 0: newProcess.setArrivalTime(processData[0]); break;
+				case 1:	newProcess.setBurstNumber(processData[1]); break;
+				case 2:	newProcess.setTotalCPUNeeded(processData[2]); break;
+				case 3:	newProcess.setIONumber(processData[3]); break;
+			}
+		}
+		
+		return newProcess;
+	}
+	
+//	public boolean equals(Object obj){
+//	    return equals((Process)obj);
+//  }
 		
 }
