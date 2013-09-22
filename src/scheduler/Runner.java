@@ -71,7 +71,7 @@ public class Runner {
 		
 		System.out.println(args[0]);
 		
-		scheduler.runCycle();	
+		scheduler.runScheduler();	
 		
 		System.out.println();
 		/* Extract and reformat the contents of the processes for printing. 
