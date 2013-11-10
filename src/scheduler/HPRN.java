@@ -7,7 +7,7 @@ public class HPRN extends SchedulingAlgo{
 	TreeSet<Process> readyTree = new TreeSet<Process>(new HighestPriority());
 	
 	public HPRN(int numberOfProcesses){
-		unlocked = true;
+		setLock(false);
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	
@@ -37,7 +37,7 @@ public class HPRN extends SchedulingAlgo{
 		checkReadyTree();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
-			unlocked = true;
+			setLock(false);
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class HPRN extends SchedulingAlgo{
 				//If it is, then set this process to RUNNING, and leave it on the readyTree.
 				currentProcess.setState(Process.RUNNING, readyQ);
 				//Lock the semaphore
-				unlocked = false;
+				setLock(true);
 				//Run one cycle
 				currentProcess.reduceBurst();
 				currentProcess.reduceCPU();
@@ -94,7 +94,7 @@ public class HPRN extends SchedulingAlgo{
 			//If it is, then set this process to RUNNING, and leave it on the readyTree.
 			readyProcess.setState(Process.RUNNING, readyQ);
 			//Lock the semaphore
-			unlocked = false;
+			setLock(false);
 			//Run one cycle
 			readyProcess.reduceBurst();
 			readyProcess.reduceCPU();
@@ -117,7 +117,7 @@ public class HPRN extends SchedulingAlgo{
 			processQ.offer(currentProcess);
 			numberTerminated++;
 			//Unlock the semaphore
-			unlocked = true;
+			setLock(false);
 		}
 		else if(currentProcess.getRemainingBurst() >= 1){
 			currentProcess.reduceBurst();

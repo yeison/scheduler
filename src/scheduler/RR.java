@@ -8,9 +8,10 @@ public class RR extends SchedulingAlgo{
 	LinkedList<Process> readyQ;
 	
 	public RR(int numberOfProcesses, int quantum){
-		unlocked = true;
+		setLock(false);
 		this.quantum = quantum;
 		this.readyQ = new LinkedList<Process>();
+		this.tempQ = new LinkedList<Process>();
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	

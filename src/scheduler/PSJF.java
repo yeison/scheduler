@@ -5,9 +5,10 @@ import java.util.PriorityQueue;
 public class PSJF extends SchedulingAlgo {
 	
 	public PSJF(int numberOfProcesses){
-		unlocked = true;
+		setLock(false);
 		this.numberOfProcesses = numberOfProcesses;
 		this.readyQ = new PriorityQueue<Process>(11, new ShortestJob());
+		this.tempQ = new PriorityQueue<Process>(11, new ShortestJob());
 	}
 	
 //    @Override

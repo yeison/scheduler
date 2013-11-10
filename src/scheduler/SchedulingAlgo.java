@@ -12,8 +12,9 @@ abstract public class SchedulingAlgo {
     // LinkedList and PriorityQueue both implement Queue
 	Queue<Process> readyQ;
 	LinkedList<Process> printQ;
-	LinkedList<Process> tempQ;
+	Queue<Process> tempQ;
 	protected int cycle = 0;
+	private int lastLockCycle = -1;
 	//A semaphore for the processor.
 	protected boolean unlocked;
 	protected boolean unlockNextCycle;
@@ -29,11 +30,27 @@ abstract public class SchedulingAlgo {
 		processQ.offer(newProcess);
 	}
 	
+	protected void setLock(boolean lock){		
+		if(!lock){
+			if(lastLockCycle == this.cycle){
+				// Don't do anything, we locked this cycle
+				return;
+			} else {
+				unlocked = true;
+			}
+		} 
+		else{
+			unlocked = false;
+			lastLockCycle = this.cycle;
+		}
+	}
+	
 	
 	public void runCycle(){
 		Process currentProcess;
 		int state;
-		tempQ = new LinkedList<Process>(processQ);
+		tempQ.clear();
+		tempQ.addAll(processQ);
 		printCycle();
 		processQ.clear();
 		
@@ -71,11 +88,19 @@ abstract public class SchedulingAlgo {
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
 //		checkReadyQueue();
+//		checkIfReadyNextCycle();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
-			unlocked = true;
+			setLock(false);
 	}
 	
+	private void checkIfReadyNextCycle() {
+		for(Process p : processQ){
+			if((p.getArrivalTime() - this.cycle) == 0)
+				p.setState(Process.READY, readyQ);
+		}
+	}
+
 	public void checkArrivalOf(Process currentProcess){
 		/* If the processes' time has arrived, set the process to ready.  If not, 
 		 * place back into the queue.*/
@@ -105,7 +130,7 @@ abstract public class SchedulingAlgo {
 				currentProcess.setState(Process.RUNNING, readyQ);
 				
 				//Lock the semaphore
-				unlocked = false;
+				setLock(true);
 				//Run one cycle
 				//currentProcess.reduceBurst();
 				currentProcess.reduceCPU();
@@ -130,7 +155,7 @@ abstract public class SchedulingAlgo {
 			readyProcess.setState(Process.RUNNING, readyQ);
 			
 			//Lock the semaphore
-			unlocked = false;
+			setLock(true);
 			
 			//Run one cycle
 			//readyProcess.reduceBurst();
@@ -153,14 +178,14 @@ abstract public class SchedulingAlgo {
 			processQ.offer(currentProcess);
 			numberTerminated++;
 			//Unlock the semaphore
-			unlocked = true;
+			setLock(false);
 			Process.runningProcess = null;
 		}
 		else if(currentProcess.getRemainingBurst() > 1){
 			currentProcess.reduceBurst();
 			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
-			unlocked = false; //Assure that the processor is locked.
+			setLock(true); //Assure that the processor is locked.
 		}
 		else{
 			//Burst time has run out, block this process.
@@ -169,7 +194,7 @@ abstract public class SchedulingAlgo {
 
 			processQ.offer(currentProcess);
 			//Unlock the semaphore
-			unlocked = true;
+			setLock(false);
 			Process.runningProcess = null;
 		}
 			

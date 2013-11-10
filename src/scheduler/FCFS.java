@@ -6,8 +6,9 @@ import java.util.LinkedList;
 public class FCFS extends SchedulingAlgo{
 	
 	public FCFS(int numberOfProcesses){
-		unlocked = true;
+		setLock(false);
 		this.readyQ = new LinkedList<Process>();
+		this.processQ = new LinkedList<Process>();
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	
