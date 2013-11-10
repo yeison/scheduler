@@ -15,8 +15,8 @@ public class RR extends SchedulingAlgo{
 	}
 	
 	public void offer(Process newProcess){
-		if(newProcess.burstNumber > quantum)
-			newProcess.burstNumber = quantum;
+		if(newProcess.getBurstNumber() > quantum)
+			newProcess.setBurstNumber(quantum);
 		processQ.offer(newProcess);
 	}
 

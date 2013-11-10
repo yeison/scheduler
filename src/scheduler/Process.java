@@ -1,24 +1,25 @@
 package scheduler;
 import java.lang.Comparable;
+import java.util.Queue;
+
+import scheduler.exceptions.InvalidProcessInstanceException;
 
 
 /**
  * A Comparable class of objects, that may be easily sorted by its time of
  * arrival.
- * @author Yeison Rodriguez
- *
- */
+ * @author Yeison Rodriguez */
 public class Process implements Comparable<Process>{
-	int arrivalTime; //A
-	int burstNumber; //B
-	int totalCPUNeeded; //C
-	int IONumber; //IO
-	int remainingBurst;
-	int burstDuration;
-	int remainingCPU;
-	int order;
-	int priorityRatio = 0;
-	boolean tampered = false;
+	private int arrivalTime; //A
+	private int burstNumber; //B
+	private int totalCPUNeeded; //C
+	private int IONumber; //IO
+	private int remainingBurst;
+	private int burstDuration;
+	private int remainingCPU;
+	private int order;
+	private int priorityRatio = 0;
+	private boolean tampered = false;  
 	
 	
 	int finishingTime, turnAroundTime, IOTime, waitingTime;
@@ -68,26 +69,32 @@ public class Process implements Comparable<Process>{
 		remainingCPU--;
 	}
 
-	void setState(int state){
+	void setState(int state, Queue<Process> readyQueue){
 		switch(state){
 			case UNSTARTED: 
 				break;
 			
-			case READY:   
+			case READY:
+				//Set to ready and insert into ready queue.
+				if(!readyQueue.contains(this))
+					readyQueue.offer(this);
 				break;
 			
 			case RUNNING: 
 				if(previousState == Process.BLOCKED || previousState == Process.UNSTARTED)
-				    setRemainingBurst(burstNumber); 
+				    setRemainingBurst(burstNumber);
 			    
 				runningProcess = this;
 				break;
 			
-			case BLOCKED: 
+			case BLOCKED:
+				readyQueue.remove(this);
 				setRemainingBurst(IONumber);  
 				break;
 			
 			case TERMINATED:
+				if(readyQueue.contains(this))
+					readyQueue.remove(this);
 				setRemainingBurst(0);
 				finishingTime = cycle; 
 				break;
@@ -140,6 +147,10 @@ public class Process implements Comparable<Process>{
 			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
 	}
 	
+	int getInstance(){
+		return this.processInstance;
+	}
+	
 	boolean checkTampered(){
 		boolean tempTampered = this.tampered;
 		this.tampered = false;
@@ -154,8 +165,7 @@ public class Process implements Comparable<Process>{
 	/**
 	 * The method below needs to be implemented for comparables.
 	 * We want to order the objects by their time of arrival.
-	 * @param other - The process to be compared to this one.
-	 */
+	 * @param other - The process to be compared to this one. */
 	public int compareTo(Process other){
 		//If this process arrived earlier, return -1.
 		if(this.getArrivalTime() < other.getArrivalTime())
@@ -165,8 +175,10 @@ public class Process implements Comparable<Process>{
 			//then sort by the order of input.
 			if(this.processInstance < other.processInstance)
 				return -1;
-			else
+			else if(this.processInstance > other.processInstance)
 			    return 1;
+			else
+				throw new InvalidProcessInstanceException("processInstance value cannot be correct: " + this.processInstance );
 		}
 		//If this process arrived later, return a 1.
 		else
@@ -178,17 +190,47 @@ public class Process implements Comparable<Process>{
 	}
 	
 	
-	public boolean equals(Object obj){
+	@Override
+	public boolean equals(Object obj){		
 		return equals((Process)obj);
 	}
+
 	
 	public boolean equals(Process p){
+		if(p == null){
+			return false;
+		}
+		
 		return p.hashCode() == this.hashCode();
 	}
 	
 	@Override
 	public String toString(){
 		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + " CPU:" + remainingCPU + ")";
+	}
+
+	public int getRemainingBurst() {
+		return this.remainingBurst;
+	}
+
+	public int getRemainingCPU() {
+		return this.remainingCPU;
+	}
+
+	public int getBurstNumber() {
+		return this.burstNumber;
+	}
+
+	public int getTotalCPUNeeded() {
+		return this.totalCPUNeeded;
+	}
+
+	public int getIONumber() {
+		return this.IONumber;
+	}
+
+	public void setOrder(int processOrder) {
+		this.order = processOrder;
 	}
 		
 }

@@ -11,6 +11,7 @@ public class HPRN extends SchedulingAlgo{
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	
+	@Override
 	public void runCycle(){
 		Process currentProcess;
 		int state;
@@ -33,17 +34,18 @@ public class HPRN extends SchedulingAlgo{
 		}
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
-		checkreadyTreeueue();
+		checkReadyTree();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
 			unlocked = true;
 	}
 	
+	@Override
 	public void checkArrivalOf(Process currentProcess){
 		/*If the processes' time has arrived, set the process to ready.  If not, 
 		 *place back into the queue.*/
-		if((currentProcess.arrivalTime - this.cycle) == 0){
-			currentProcess.setState(Process.READY);
+		if((currentProcess.getArrivalTime() - this.cycle) == 0){
+			currentProcess.setState(Process.READY, readyQ);
 			//Set to ready and insert into ready queue.
 			readyTree.add(currentProcess);
 			/*If this process is ready, and the semaphore is unlocked, then go 
@@ -59,20 +61,21 @@ public class HPRN extends SchedulingAlgo{
 			processQ.offer(currentProcess);
 	}
 	
+	@Override
 	public boolean checkReadyToRun(Process currentProcess){
 		//Simple method checks if a process is running before running the new process.
 		if(unlocked){
 			//Is this process at the head of the readyTree?
 			if(currentProcess.equals(readyTree.first())){
 				//If it is, then set this process to RUNNING, and leave it on the readyTree.
-				currentProcess.setState(Process.RUNNING);
+				currentProcess.setState(Process.RUNNING, readyQ);
 				//Lock the semaphore
 				unlocked = false;
 				//Run one cycle
 				currentProcess.reduceBurst();
 				currentProcess.reduceCPU();
 				//unlock the semaphore for the next cycle if this processes' burst is 1.
-				if(currentProcess.remainingBurst == 0)
+				if(currentProcess.getRemainingBurst() == 0)
 					unlockNextCycle = true;
 			}
 			processQ.offer(currentProcess);
@@ -83,30 +86,31 @@ public class HPRN extends SchedulingAlgo{
 		return false;
 	}
 	
-	public boolean checkreadyTreeueue(){
+	
+	public boolean checkReadyTree(){
 		if(unlocked && !readyTree.isEmpty()){
 			Process readyProcess = readyTree.first();
 			//Is this process at the head of the readyTree?
 			//If it is, then set this process to RUNNING, and leave it on the readyTree.
-			readyProcess.setState(Process.RUNNING);
+			readyProcess.setState(Process.RUNNING, readyQ);
 			//Lock the semaphore
 			unlocked = false;
 			//Run one cycle
 			readyProcess.reduceBurst();
 			readyProcess.reduceCPU();
 			//unlock the semaphore for the next cycle if this processes' burst is 1.
-			if(readyProcess.remainingBurst == 0)
+			if(readyProcess.getRemainingBurst() == 0)
 				unlockNextCycle = true;
 			return true;
 		}
 		return false;
 	}
 	
-
+	@Override
 	public void checkRunningToBlock(Process currentProcess){
-		if(currentProcess.remainingCPU < 1){
+		if(currentProcess.getRemainingCPU() < 1){
 			//No more CPU time needed.  Process finished.
-			currentProcess.setState(Process.TERMINATED);
+			currentProcess.setState(Process.TERMINATED, readyQ);
 			//Remove the process from the ready queue.
 			readyTree.remove(readyTree.first());
 			//Place back in the processQ for printing of state.
@@ -115,14 +119,14 @@ public class HPRN extends SchedulingAlgo{
 			//Unlock the semaphore
 			unlocked = true;
 		}
-		else if(currentProcess.remainingBurst >= 1){
+		else if(currentProcess.getRemainingBurst() >= 1){
 			currentProcess.reduceBurst();
 			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
 			unlocked = false; //Assure that the processor is locked.
 		}
 		else{//Burst time has run out, block this process.
-			currentProcess.setState(Process.BLOCKED);
+			currentProcess.setState(Process.BLOCKED, readyQ);
 			currentProcess.reduceBurst();
 			//Remove from the readyTree.
 			System.out.println(readyTree.first().hashCode());
@@ -135,19 +139,21 @@ public class HPRN extends SchedulingAlgo{
 			
 	}
 	
+	@Override
 	public void checkBlockedToReady(Process currentProcess){
-		if(currentProcess.remainingBurst >= 1){
+		if(currentProcess.getRemainingBurst() >= 1){
 			currentProcess.reduceBurst();
 			processQ.offer(currentProcess);
 		}
 		else{
-			currentProcess.setState(Process.READY);
+			currentProcess.setState(Process.READY, readyQ);
 			//Place the process on the ready queue.  Wait its turn to run.
 			readyTree.add(currentProcess);
 			checkReadyToRun(currentProcess);
 		}		
 	}
 	
+	@Override
 	public void printCycle(){
 		Process currentProcess;
 		String cycleLine = "";
@@ -156,13 +162,14 @@ public class HPRN extends SchedulingAlgo{
 		//Print the print queue.
 		while((currentProcess = pqCopy.poll()) != null){
 			cycleLine += " \t" + currentProcess.getStateString() + " " 
-			+ currentProcess.remainingBurst;
+			+ currentProcess.getRemainingBurst();
 		}
  
 		System.out.println("Before cycle " + cycle + ": " + cycleLine);
 	}
 	
 	//Indicates that all processes have finished running.
+	@Override
 	public boolean isFinished(){
 		if(numberTerminated == numberOfProcesses)
 			return true;

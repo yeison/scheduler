@@ -4,9 +4,7 @@ import java.util.StringTokenizer;
 import java.io.*;
 
 /**
- * @author Yeison Rodriguez
- *
- */
+ * @author Yeison Rodriguez */
 public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
@@ -61,12 +59,17 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		SchedulingAlgo algo = new PSJF (numberOfProcesses);
+		SchedulingAlgo algo = new PSJF(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
 			algo.offer(pArray[i]);
 		}
+		
+		for(Process p : pArray){
+			System.out.println(p);
+		}
+			
 		
 		algo.capturePrintQueue();
 		System.out.println(args[0]);
@@ -75,20 +78,18 @@ public class Runner {
 		
 		System.out.println();
 		/* Extract and reformat the contents of the processes for printing. 
-		 * Print each process in priority order.
-		 */
-		for(int i = 0; i < pArray.length; i++){
-			System.out.println("Process " + i + ":\n" + 
-					"\t(A, B, C, IO) = " + "(" + pArray[i].arrivalTime + ", " + 
-					pArray[i].burstNumber + ", " + pArray[i].totalCPUNeeded + 
-					", " + pArray[i].IONumber + ")" + 
-					"\n\tFinishing Time: " + pArray[i].finishingTime + 
-					"\n\tTurnaround Time: " + (pArray[i].finishingTime - pArray[i].arrivalTime) +
-					"\n\tI/O Time: " + pArray[i].IOTime +
-					"\n\tWaiting Time: " + pArray[i].waitingTime);
+		 * Print each process in priority order. */
+		for(Process p : pArray){
+			System.out.println("Process " + p.getInstance() + ":\n" + 
+					"\t(A, B, C, IO) = " + "(" + p.getArrivalTime() + ", " + 
+					p.getBurstNumber() + ", " + p.getTotalCPUNeeded() + 
+					", " + p.getIONumber() + ")" + 
+					"\n\tFinishing Time: " + p.finishingTime + 
+					"\n\tTurnaround Time: " + (p.finishingTime - p.getArrivalTime()) +
+					"\n\tI/O Time: " + p.IOTime +
+					"\n\tWaiting Time: " + p.waitingTime);
 		}
 		
-	
 	}
 	
 	/**The method below takes a StringTokenizer and reads the next four tokens 
@@ -114,7 +115,7 @@ public class Runner {
 				case 3:	newProcess.setIONumber(processData[3]); break;
 			}
 		}
-		newProcess.order = processOrder;
+		newProcess.setOrder(processOrder);
 		processOrder++;
 		return newProcess;
 	}

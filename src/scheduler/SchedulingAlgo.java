@@ -4,11 +4,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 
-public class SchedulingAlgo {
+abstract public class SchedulingAlgo {
 	
 	/**@param processQ - Contains the processes in the order of their delays, and the order they were encountered.
 	 * @param cycle - The current cycle of this set of process executions.**/
-	LinkedList<Process> processQ = new LinkedList<Process>();
+	protected LinkedList<Process> processQ = new LinkedList<Process>();
     // LinkedList and PriorityQueue both implement Queue
 	Queue<Process> readyQ;
 	LinkedList<Process> printQ;
@@ -70,7 +70,7 @@ public class SchedulingAlgo {
 		
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
-		checkReadyQueue();
+//		checkReadyQueue();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
 			unlocked = true;
@@ -79,11 +79,9 @@ public class SchedulingAlgo {
 	public void checkArrivalOf(Process currentProcess){
 		/* If the processes' time has arrived, set the process to ready.  If not, 
 		 * place back into the queue.*/
-		if((currentProcess.arrivalTime - this.cycle) == 0){
-			currentProcess.setState(Process.READY);
-			//Set to ready and insert into ready queue.
-			if(!readyQ.contains(currentProcess))
-			    readyQ.offer(currentProcess);
+		if((currentProcess.getArrivalTime() - this.cycle) == 0){
+			currentProcess.setState(Process.READY, readyQ);
+
 			/* If this process is ready, and the semaphore is unlocked, then go 
 			 * ahead and run it.  After setting to running return from this function.*/
 			if(unlocked){
@@ -104,7 +102,7 @@ public class SchedulingAlgo {
 			//Is this process at the head of the readyQ?
 			if(currentProcess.equals(readyQ.peek())){
 				//If it is, then set this process to RUNNING, and leave it on the readyQ.
-				currentProcess.setState(Process.RUNNING);
+				currentProcess.setState(Process.RUNNING, readyQ);
 				
 				//Lock the semaphore
 				unlocked = false;
@@ -112,7 +110,7 @@ public class SchedulingAlgo {
 				//currentProcess.reduceBurst();
 				currentProcess.reduceCPU();
 				//unlock the semaphore for the next cycle if this processes' burst is 1.
-				if(currentProcess.remainingBurst == 1)
+				if(currentProcess.getRemainingBurst() == 1)
 					unlockNextCycle = true;
 			}
 			
@@ -129,7 +127,7 @@ public class SchedulingAlgo {
 			Process readyProcess = readyQ.peek();
 			//Is this process at the head of the readyQ?
 			//If it is, then set this process to RUNNING, and leave it on the readyQ.
-			readyProcess.setState(Process.RUNNING);
+			readyProcess.setState(Process.RUNNING, readyQ);
 			
 			//Lock the semaphore
 			unlocked = false;
@@ -138,7 +136,7 @@ public class SchedulingAlgo {
 			//readyProcess.reduceBurst();
 			readyProcess.reduceCPU();
 			//unlock the semaphore for the next cycle if this processes' burst is 1.
-			if(readyProcess.remainingBurst == 1)
+			if(readyProcess.getRemainingBurst() == 1)
 				unlockNextCycle = true;
 			return true;
 		}
@@ -147,11 +145,10 @@ public class SchedulingAlgo {
 	
 
 	public void checkRunningToBlock(Process currentProcess){
-		if(currentProcess.remainingCPU < 1){
+		if(currentProcess.getRemainingCPU() < 1){
 			//No more CPU time needed.  Process finished.
-			currentProcess.setState(Process.TERMINATED);
-			//Remove the process from the ready queue.
-			readyQ.poll();
+			currentProcess.setState(Process.TERMINATED, readyQ);
+			
 			//Place back in the processQ for printing of state.
 			processQ.offer(currentProcess);
 			numberTerminated++;
@@ -159,7 +156,7 @@ public class SchedulingAlgo {
 			unlocked = true;
 			Process.runningProcess = null;
 		}
-		else if(currentProcess.remainingBurst > 1){
+		else if(currentProcess.getRemainingBurst() > 1){
 			currentProcess.reduceBurst();
 			currentProcess.reduceCPU();
 			processQ.offer(currentProcess);
@@ -167,10 +164,9 @@ public class SchedulingAlgo {
 		}
 		else{
 			//Burst time has run out, block this process.
-			currentProcess.setState(Process.BLOCKED);
+			currentProcess.setState(Process.BLOCKED, readyQ);
 			//currentProcess.reduceBurst();
-			//Remove from the readyQ.
-			readyQ.poll();
+
 			processQ.offer(currentProcess);
 			//Unlock the semaphore
 			unlocked = true;
@@ -181,16 +177,13 @@ public class SchedulingAlgo {
 	
 	public void checkBlockedToReady(Process currentProcess){
 		
-		if(currentProcess.remainingBurst > 1){
+		if(currentProcess.getRemainingBurst() > 1){
 			currentProcess.reduceBurst();
 			processQ.offer(currentProcess);
 		}
 		else{
 			currentProcess.reduceBurst();
-			currentProcess.setState(Process.READY);
-			//Place the process on the ready queue.  Wait its turn to run.
-			if(!readyQ.contains(currentProcess))
-			    readyQ.offer(currentProcess);
+			currentProcess.setState(Process.READY, readyQ);
 			checkReadyToRun(currentProcess);
 		}		
 
@@ -204,7 +197,7 @@ public class SchedulingAlgo {
 		//Print the print queue.
 		while((currentProcess = pqCopy.poll()) != null){
 			cycleLine += " \t" + currentProcess.getStateString() + " " 
-			+ currentProcess.remainingBurst;
+			+ currentProcess.getRemainingBurst();
 		}
  
 		System.out.println("Before cycle " + cycle + ": " + cycleLine);
