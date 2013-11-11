@@ -1,6 +1,7 @@
 package scheduler;
 
 import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class HPRN extends SchedulingAlgo{
 //	TreeSet<Process> readyTree = new TreeSet<Process>(new HighestPriority());

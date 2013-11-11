@@ -65,8 +65,7 @@ public class Process implements Comparable<Process>{
 	void reduceCPU(Queue<Process> readyQueue){
 		reduceCPU();
 		
-		// Horribly inefficent, but PriorityQueue does not resort automatically
-		// when one of its members changes state.
+		// Horribly inefficient
 		if(readyQueue.contains(this)){
 			readyQueue.remove(this);
 			readyQueue.add(this);
@@ -74,7 +73,8 @@ public class Process implements Comparable<Process>{
 	}
 	
 	void reduceCPU(){
-		remainingCPU--;		
+		remainingCPU--;
+		updatePriorityRatio();
 	}
 
 	void setState(int state, Queue<Process> readyQueue){
@@ -132,6 +132,7 @@ public class Process implements Comparable<Process>{
 	void setTotalCPUNeeded(int c) {
 		this.totalCPUNeeded = c;
 		this.remainingCPU = c;
+		updatePriorityRatio();
 	}
 
 	void setBurstNumber(int b) {
@@ -152,7 +153,12 @@ public class Process implements Comparable<Process>{
 	}
 	
 	double getPriorityRatio(){
-		return
+		updatePriorityRatio();
+		return priorityRatio;
+	}
+	
+	private void updatePriorityRatio(){		
+		priorityRatio = 			
 			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
 	}
 	

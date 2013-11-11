@@ -6,7 +6,8 @@ import java.util.Queue;
 
 abstract public class SchedulingAlgo {
 	
-	/**@param processQ - Contains the processes in the order of their delays, and the order they were encountered.
+	/**@param processQ - Contains the processes in the order of their delays, 
+	 * and the order they were encountered.
 	 * @param cycle - The current cycle of this set of process executions.**/
 	protected LinkedList<Process> processQ = new LinkedList<Process>();
     // LinkedList and PriorityQueue both implement Queue
@@ -50,12 +51,15 @@ abstract public class SchedulingAlgo {
 		Process currentProcess;
 		int state;
 		tempQ.clear();
-		tempQ.addAll(processQ);
+		for(Process p : processQ){
+			tempQ.add(p);
+		}
 		printCycle();
 		processQ.clear();
 		
 		
 		while(!tempQ.isEmpty()){
+			currentProcess = tempQ.peek();
 			currentProcess = tempQ.poll();
 			state = currentProcess.state;
 		
