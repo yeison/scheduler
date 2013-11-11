@@ -9,6 +9,7 @@ public class FCFS extends SchedulingAlgo{
 		setLock(false);
 		this.readyQ = new LinkedList<Process>();
 		this.processQ = new LinkedList<Process>();
+		this.tempQ = new LinkedList<Process>();
 		this.numberOfProcesses = numberOfProcesses;
 	}
 	

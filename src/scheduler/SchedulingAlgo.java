@@ -87,7 +87,7 @@ abstract public class SchedulingAlgo {
 		
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
-//		checkReadyQueue();
+		checkReadyQueue();
 //		checkIfReadyNextCycle();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
@@ -131,9 +131,7 @@ abstract public class SchedulingAlgo {
 				
 				//Lock the semaphore
 				setLock(true);
-				//Run one cycle
-				//currentProcess.reduceBurst();
-				currentProcess.reduceCPU();
+
 				//unlock the semaphore for the next cycle if this processes' burst is 1.
 				if(currentProcess.getRemainingBurst() == 1)
 					unlockNextCycle = true;
@@ -156,10 +154,7 @@ abstract public class SchedulingAlgo {
 			
 			//Lock the semaphore
 			setLock(true);
-			
-			//Run one cycle
-			//readyProcess.reduceBurst();
-			readyProcess.reduceCPU();
+
 			//unlock the semaphore for the next cycle if this processes' burst is 1.
 			if(readyProcess.getRemainingBurst() == 1)
 				unlockNextCycle = true;

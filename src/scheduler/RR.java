@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 public class RR extends SchedulingAlgo{
 	private int quantum;
-	LinkedList<Process> readyQ;
 	
 	public RR(int numberOfProcesses, int quantum){
 		setLock(false);

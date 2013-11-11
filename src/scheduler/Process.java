@@ -1,8 +1,5 @@
 package scheduler;
-import java.lang.Comparable;
 import java.util.Queue;
-
-import scheduler.exceptions.InvalidProcessInstanceException;
 
 
 /**
@@ -20,7 +17,7 @@ public class Process implements Comparable<Process>{
 	private int order;
 	private int priorityRatio = 0;
 	private boolean tampered = false;  
-	
+
 	
 	int finishingTime, turnAroundTime, IOTime, waitingTime;
 	
@@ -65,8 +62,19 @@ public class Process implements Comparable<Process>{
 		burstDuration++;
 	}
 	
+	void reduceCPU(Queue<Process> readyQueue){
+		reduceCPU();
+		
+		// Horribly inefficent, but PriorityQueue does not resort automatically
+		// when one of its members changes state.
+		if(readyQueue.contains(this)){
+			readyQueue.remove(this);
+			readyQueue.add(this);
+		}
+	}
+	
 	void reduceCPU(){
-		remainingCPU--;
+		remainingCPU--;		
 	}
 
 	void setState(int state, Queue<Process> readyQueue){
@@ -77,12 +85,13 @@ public class Process implements Comparable<Process>{
 			case READY:
 				//Set to ready and insert into ready queue.
 				if(!readyQueue.contains(this))
-					readyQueue.offer(this);
+					readyQueue.add(this);
 				break;
 			
 			case RUNNING: 
 				if(previousState == Process.BLOCKED || previousState == Process.UNSTARTED)
 				    setRemainingBurst(burstNumber);
+					reduceCPU(readyQueue);
 			    
 				runningProcess = this;
 				break;
@@ -142,7 +151,7 @@ public class Process implements Comparable<Process>{
 		return this.arrivalTime;
 	}
 	
-	int getRatio(){
+	double getPriorityRatio(){
 		return
 			(cycle - arrivalTime)/(Math.max(1, totalCPUNeeded - remainingCPU));
 	}
@@ -178,7 +187,7 @@ public class Process implements Comparable<Process>{
 			else if(this.processInstance > other.processInstance)
 			    return 1;
 			else
-				throw new InvalidProcessInstanceException("processInstance value cannot be correct: " + this.processInstance );
+				return 0;
 		}
 		//If this process arrived later, return a 1.
 		else
@@ -206,7 +215,12 @@ public class Process implements Comparable<Process>{
 	
 	@Override
 	public String toString(){
-		return "(Instance:" + this.processInstance + " State:" + getStateString() + " Burst:" + remainingBurst + " CPU:" + remainingCPU + ")";
+		return "(Instance:" + this.processInstance 
+				+ " State:" + getStateString() 
+				+ " Burst:" + remainingBurst 
+				+ " CPU:" + remainingCPU
+				+ " pRatio:" + getPriorityRatio() 
+				+ ")";
 	}
 
 	public int getRemainingBurst() {
