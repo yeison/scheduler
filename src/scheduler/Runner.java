@@ -59,7 +59,7 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		SchedulingAlgo algo = new HPRN(numberOfProcesses);
+		SchedulingAlgo algo = new PSJF(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
@@ -90,6 +90,12 @@ public class Runner {
 					"\n\tWaiting Time: " + p.waitingTime);
 		}
 		
+		System.out.println("\nFinishing Time: " + algo.getCycle());
+		System.out.println("CPU Utilization: " + algo.getCPUUtilization());
+		System.out.println("I/O Utilization: " + algo.getIOUtilization(pArray));
+		System.out.println("Processes per 100 cycles: " + 100*algo.getProcessesPerCycle());
+		System.out.println("Average turnaround time: " + algo.getAverageTurnaroundTime(pArray));
+		System.out.println("Average waiting time: " + algo.getAverageWaitingTime(pArray));
 	}
 	
 	/**The method below takes a StringTokenizer and reads the next four tokens 

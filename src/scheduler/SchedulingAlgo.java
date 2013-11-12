@@ -1,5 +1,6 @@
 package scheduler;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -9,7 +10,7 @@ abstract public class SchedulingAlgo {
 	/**@param processQ - Contains the processes in the order of their delays, 
 	 * and the order they were encountered.
 	 * @param cycle - The current cycle of this set of process executions.**/
-	protected LinkedList<Process> processQ = new LinkedList<Process>();
+	protected Queue<Process> processQ = new LinkedList<Process>();
     // LinkedList and PriorityQueue both implement Queue
 	Queue<Process> readyQ;
 	LinkedList<Process> printQ;
@@ -21,6 +22,7 @@ abstract public class SchedulingAlgo {
 	protected boolean unlockNextCycle;
 	int numberTerminated = 0;
 	int numberOfProcesses;
+	private int cyclesRunning = 0;
 	
 	
 	public void capturePrintQueue(){
@@ -48,18 +50,17 @@ abstract public class SchedulingAlgo {
 	
 	
 	public void runCycle(){
+
 		Process currentProcess;
 		int state;
 		tempQ.clear();
-		for(Process p : processQ){
-			tempQ.add(p);
-		}
+		tempQ.addAll(processQ);
+
 		printCycle();
 		processQ.clear();
 		
 		
 		while(!tempQ.isEmpty()){
-			currentProcess = tempQ.peek();
 			currentProcess = tempQ.poll();
 			state = currentProcess.state;
 		
@@ -89,13 +90,16 @@ abstract public class SchedulingAlgo {
 			}
 		}
 		
+		if(!unlocked){
+			cyclesRunning++;
+		}
+		
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
 		checkReadyQueue();
-//		checkIfReadyNextCycle();
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
-			setLock(false);
+			setLock(false);		
 	}
 	
 	private void checkIfReadyNextCycle() {
@@ -233,5 +237,47 @@ abstract public class SchedulingAlgo {
 			return true;
 		else
 			return false;
+	}
+	
+	public int getCyclesRunning(){
+		return cyclesRunning;
+	}
+	
+	public int getCycle(){
+		return cycle;		
+	}
+	
+	public double getCPUUtilization(){
+		return (double)getCyclesRunning()/getCycle();
+	}
+	
+	public double getIOUtilization(Process[] pArray){
+		int totalIO = 0;
+		for(Process p : pArray){
+			totalIO += p.IOTime;			
+		}
+		return (double)totalIO/getCycle();		
+	}
+	
+	public double getProcessesPerCycle(){
+		return (double)numberOfProcesses/getCycle();
+	}
+	
+	public double getAverageTurnaroundTime(Process[] pArray){
+		int totalTurnaroundTime = 0;
+		for(Process p : pArray){
+			totalTurnaroundTime += (p.finishingTime - p.getArrivalTime());
+		}
+		
+		return (double)totalTurnaroundTime/numberOfProcesses;
+	}
+	
+	public double getAverageWaitingTime(Process[] pArray){
+		int totalWaitingTime = 0;
+		for(Process p : pArray){
+			totalWaitingTime += p.waitingTime;
+		}
+		
+		return (double)totalWaitingTime/numberOfProcesses;
 	}
 }
