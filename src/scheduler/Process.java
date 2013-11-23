@@ -1,4 +1,6 @@
 package scheduler;
+import static scheduler.Runner.randomOS;
+
 import java.util.Queue;
 
 
@@ -53,7 +55,7 @@ public class Process implements Comparable<Process>{
 	}
 	
 	void setRemainingBurst(int burst){
-		remainingBurst = burst;
+		remainingBurst = randomOS(burst);
 		burstDuration = 0;
 	}
 	

@@ -9,10 +9,13 @@ public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
 	static int processOrder = 0;
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+    
+	private static RandomFileReader randomReader;
+		
+
+	public static void main(String[] args) throws Error, Exception {
+		randomReader = new RandomFileReader();
+		
 		PriorityQueue<Process> processQueue = new PriorityQueue<Process>();
 		FileReader fileReader = null;
 		int numberOfProcesses = 0;
@@ -59,7 +62,8 @@ public class Runner {
 			processQueue.offer(newProcess);
 		}
 
-		SchedulingAlgo algo = new PSJF(numberOfProcesses);
+		/** Here we specify the Algo Type **/
+		SchedulingAlgo algo = new FCFS(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
@@ -90,10 +94,10 @@ public class Runner {
 					"\n\tWaiting Time: " + p.waitingTime);
 		}
 		
-		System.out.println("\nFinishing Time: " + algo.getCycle());
+		System.out.println("\nFinishing Time: " + algo.getLastCycle());
 		System.out.println("CPU Utilization: " + algo.getCPUUtilization());
 		System.out.println("I/O Utilization: " + algo.getIOUtilization(pArray));
-		System.out.println("Processes per 100 cycles: " + 100*algo.getProcessesPerCycle());
+		System.out.println("Throughput : " + 100*algo.getProcessesPerCycle() + " processes per 100 cycles");
 		System.out.println("Average turnaround time: " + algo.getAverageTurnaroundTime(pArray));
 		System.out.println("Average waiting time: " + algo.getAverageWaitingTime(pArray));
 	}
@@ -124,5 +128,17 @@ public class Runner {
 		newProcess.setOrder(processOrder);
 		processOrder++;
 		return newProcess;
+	}
+	
+	public static int randomOS(int U){
+		String nextRandomNumber = null;
+		
+		try {
+			nextRandomNumber = randomReader.getNextLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return U == 0 ? 1 : 1 + (Integer.valueOf(nextRandomNumber) % U);
 	}
 }

@@ -1,6 +1,5 @@
 package scheduler;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -33,18 +32,16 @@ abstract public class SchedulingAlgo {
 		processQ.offer(newProcess);
 	}
 	
-	protected void setLock(boolean lock){		
+	protected void setLock(boolean lock){
+		if(lastLockCycle == this.cycle)
+			// Don't do anything, we locked this cycle
+			return;
 		if(!lock){
-			if(lastLockCycle == this.cycle){
-				// Don't do anything, we locked this cycle
-				return;
-			} else {
-				unlocked = true;
-			}
-		} 
-		else{
+		    unlocked = true;
+		} else{
 			unlocked = false;
 			lastLockCycle = this.cycle;
+			cyclesRunning++;
 		}
 	}
 	
@@ -90,9 +87,6 @@ abstract public class SchedulingAlgo {
 			}
 		}
 		
-		if(!unlocked){
-			cyclesRunning++;
-		}
 		
 		/* The function call below will only set the process to running if the
 		 * semaphore is still unlocked after going through all processes.*/
@@ -100,13 +94,6 @@ abstract public class SchedulingAlgo {
 		Process.cycle = ++cycle;
 		if(unlockNextCycle)
 			setLock(false);		
-	}
-	
-	private void checkIfReadyNextCycle() {
-		for(Process p : processQ){
-			if((p.getArrivalTime() - this.cycle) == 0)
-				p.setState(Process.READY, readyQ);
-		}
 	}
 
 	public void checkArrivalOf(Process currentProcess){
@@ -243,12 +230,12 @@ abstract public class SchedulingAlgo {
 		return cyclesRunning;
 	}
 	
-	public int getCycle(){
-		return cycle;		
+	public int getLastCycle(){
+		return cycle-1;		
 	}
 	
 	public double getCPUUtilization(){
-		return (double)getCyclesRunning()/getCycle();
+		return (double)getCyclesRunning()/getLastCycle();
 	}
 	
 	public double getIOUtilization(Process[] pArray){
@@ -256,11 +243,11 @@ abstract public class SchedulingAlgo {
 		for(Process p : pArray){
 			totalIO += p.IOTime;			
 		}
-		return (double)totalIO/getCycle();		
+		return (double)totalIO/getLastCycle();		
 	}
 	
 	public double getProcessesPerCycle(){
-		return (double)numberOfProcesses/getCycle();
+		return (double)numberOfProcesses/getLastCycle();
 	}
 	
 	public double getAverageTurnaroundTime(Process[] pArray){
