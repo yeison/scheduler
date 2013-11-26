@@ -1,4 +1,6 @@
 package scheduler;
+import static scheduler.AlgoTypes.valueOf;
+
 import java.util.PriorityQueue; 
 import java.util.StringTokenizer;
 import java.io.*;
@@ -26,32 +28,36 @@ public class Runner {
 		/* Remember to make the first argument the argument for the algorithm to
 		 * use. 
 		 */
-		if(args.length < 1){
-			System.out.println("\tUsage: scheduler <input file> \n\tPlease " +
-					"provide the name of an input file as an argument.");
+		if(args.length != 2){
+			System.out.println("  Usage: scheduler <input file> <scheduling algorithm>" +
+					"\n\tPlease provide the name of an input file and the scheduling " +
+					"algorithm as an argument." +
+					"\n\n\tThe algorithm may be one of the following:" +
+					"\n\t  FCFS" +
+					"\n\t  RR" +
+					"\n\t  PSJF" +
+					"\n\t  HPRN");
 			System.exit(0);
 		}
 		
 		try {
 			fileReader = new FileReader(args[0]);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			fileReader.read(inputBuffer);
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Error: The file name supplied was not found.");
 			System.exit(1);
 		}
-		try {
-			fileReader.read(inputBuffer);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
 		//st = new StreamTokenizer(fileReader);
 		String input = String.valueOf(inputBuffer);
 		StringTokenizer st = new StringTokenizer(input, delimeter);
 		
 		//Properly formatted input starts with the number of processes.
 		numberOfProcesses = Integer.valueOf(st.nextToken());
+		
+		System.out.println(args[0]);
+		System.out.println("Scheduling Algorithm is: " + valueOf(args[1]));
 		System.out.println("Number of Processes: " + numberOfProcesses);
 	
 		/* Make processes from the input and place them into priority queues.  
@@ -60,10 +66,10 @@ public class Runner {
 		for(int i = 0; i < numberOfProcesses; i++){
 			Process newProcess = makeProcess(st);
 			processQueue.offer(newProcess);
-		}
+		}		
 
-		/** Here we specify the Algo Type **/
-		SchedulingAlgo algo = new FCFS(numberOfProcesses);
+		/** Here we retrieve the Algo Type based on the input **/
+		SchedulingAlgo algo = valueOf(args[1]).getSchedulingAlgo(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
@@ -73,10 +79,10 @@ public class Runner {
 		for(Process p : pArray){
 			System.out.println(p);
 		}
+		System.out.println("pRatio may be ignored for non-HPRN algos\n");
 			
 		
 		algo.capturePrintQueue();
-		System.out.println(args[0]);
 		while(!algo.isFinished())
 			algo.runCycle();
 		
