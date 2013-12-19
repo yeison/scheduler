@@ -1,14 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project yeison-scheduler-90e52e6">
-<!--this file was created by Eclipse Runnable JAR Export Wizard-->
-<!--ANT 1.7 is required                                        -->
-<target name="create_run_jar">
-<jar destfile="./sched.jar" filesetmanifest="mergewithoutmain">
-<manifest>
-<attribute name="Main-Class" value="scheduler.Runner"/>
-<attribute name="Class-Path" value="."/>
-</manifest>
-<fileset dir="."/>
-</jar>
-</target>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project scheduler with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/Users/Yeison/src/oso/scheduler/scheduler.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="scheduler.Runner"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="/Users/Yeison/src/oso/scheduler/bin"/>
+        </jar>
+    </target>
 </project>
