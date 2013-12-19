@@ -102,7 +102,7 @@ abstract public class SchedulingAlgo {
 		/* If the processes' time has arrived, set the process to ready.  If not, 
 		 * place back into the queue.*/
 		if((currentProcess.getArrivalTime() - this.cycle) == 0){
-			currentProcess.setState(Process.READY, readyQ);
+			currentProcess.setState(Process.READY, readyQ, this);
 
 			/* If this process is ready, and the semaphore is unlocked, then go 
 			 * ahead and run it.  After setting to running return from this function.*/
@@ -124,7 +124,7 @@ abstract public class SchedulingAlgo {
 			//Is this process at the head of the readyQ?
 			if(currentProcess.equals(readyQ.peek())){
 				//If it is, then set this process to RUNNING, and leave it on the readyQ.
-				currentProcess.setState(Process.RUNNING, readyQ);
+				currentProcess.setState(Process.RUNNING, readyQ, this);
 				
 				//Lock the semaphore
 				setLock(true);
@@ -147,7 +147,7 @@ abstract public class SchedulingAlgo {
 			Process readyProcess = readyQ.peek();
 			//Is this process at the head of the readyQ?
 			//If it is, then set this process to RUNNING, and leave it on the readyQ.
-			readyProcess.setState(Process.RUNNING, readyQ);
+			readyProcess.setState(Process.RUNNING, readyQ, this);
 			
 			//Lock the semaphore
 			setLock(true);
@@ -164,7 +164,7 @@ abstract public class SchedulingAlgo {
 	public void checkRunningToBlock(Process currentProcess){
 		if(currentProcess.getRemainingCPU() < 1){
 			//No more CPU time needed.  Process finished.
-			currentProcess.setState(Process.TERMINATED, readyQ);
+			currentProcess.setState(Process.TERMINATED, readyQ, this);
 			
 			//Place back in the processQ for printing of state.
 			processQ.offer(currentProcess);
@@ -181,7 +181,7 @@ abstract public class SchedulingAlgo {
 		}
 		else{
 			//Burst time has run out, block this process.
-			currentProcess.setState(Process.BLOCKED, readyQ);
+			currentProcess.setState(Process.BLOCKED, readyQ, this);
 			//currentProcess.reduceBurst();
 
 			processQ.offer(currentProcess);
@@ -200,7 +200,7 @@ abstract public class SchedulingAlgo {
 		}
 		else{
 			currentProcess.reduceBurst();
-			currentProcess.setState(Process.READY, readyQ);
+			currentProcess.setState(Process.READY, readyQ, this);
 			checkReadyToRun(currentProcess);
 		}		
 

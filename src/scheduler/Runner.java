@@ -1,10 +1,10 @@
 package scheduler;
 import static scheduler.AlgoTypes.valueOf;
-import static scheduler.Runner.verbose;
 
-import java.util.PriorityQueue; 
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
-import java.io.*;
 
 /** @author Yeison Rodriguez */
 public class Runner {

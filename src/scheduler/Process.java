@@ -1,5 +1,6 @@
 package scheduler;
 import static scheduler.Runner.randomOS;
+import static scheduler.Runner.verbose;
 
 import java.util.Queue;
 
@@ -82,15 +83,22 @@ public class Process implements Comparable<Process>{
 		updatePriorityRatio();
 	}
 
-	void setState(int state, Queue<Process> readyQueue){
+	void setState(int state, Queue<Process> readyQueue, SchedulingAlgo algo){
 		switch(state){
 			case UNSTARTED: 
 				break;
 			
 			case READY:
 				//Set to ready and insert into ready queue.
-				if(!readyQueue.contains(this))
+				if(!readyQueue.contains(this)){					
 					readyQueue.add(this);
+					if(verbose && algo instanceof PSJF){
+						System.out.println(getPSJFVerbose());
+					} else if(verbose  && algo instanceof HPRN){						
+						System.out.println("Process Entered Ready Queue: " + getHPRNVerbose(this));
+						System.out.println("Process Running: " + getHPRNVerbose(runningProcess));
+					}
+				}
 				break;
 			
 			case RUNNING: 
@@ -256,6 +264,24 @@ public class Process implements Comparable<Process>{
 
 	public void setOrder(int processOrder) {
 		this.order = processOrder;
+	}
+	
+	public String getPSJFVerbose(){
+		return "Process " + this + " has entered the " +
+				"Ready Queue.  It has " + this.remainingCPU + " cycles to finish.";
+	}
+	
+	public String getHPRNVerbose(Process p){
+		if(p == null)
+			return null;
+		int runningTime = p.totalCPUNeeded - p.remainingCPU;
+		int wallTime = cycle - p.arrivalTime;
+		double penaltyRatio = getPriorityRatio();
+		
+		return  p  
+				+ " The running time t is: " + runningTime
+				+ " The wall clock T is: " + wallTime 
+				+ " The penalty ratio T/t is: " + penaltyRatio;
 	}
 		
 }
