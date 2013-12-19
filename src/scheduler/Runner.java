@@ -1,15 +1,16 @@
 package scheduler;
 import static scheduler.AlgoTypes.valueOf;
+import static scheduler.Runner.verbose;
 
 import java.util.PriorityQueue; 
 import java.util.StringTokenizer;
 import java.io.*;
 
-/**
- * @author Yeison Rodriguez */
+/** @author Yeison Rodriguez */
 public class Runner {
 	//Arbitrary number of characters allowed in an input file.
 	static final int MAX_FILE_CHARS = 100;
+	public static boolean verbose = false;
 	static int processOrder = 0;
     
 	private static RandomFileReader randomReader;
@@ -28,10 +29,10 @@ public class Runner {
 		/* Remember to make the first argument the argument for the algorithm to
 		 * use. 
 		 */
-		if(args.length != 2){
-			System.out.println("  Usage: scheduler <input file> <scheduling algorithm>" +
+		if(args.length != 2 && args.length != 3){
+			System.out.println("  Usage: scheduler [--verbose] <input file> <scheduling algorithm>" +
 					"\n\tPlease provide the name of an input file and the scheduling " +
-					"algorithm as an argument." +
+					"algorithm as an argument.  The --verbose flag is for verbose output." +
 					"\n\n\tThe algorithm may be one of the following:" +
 					"\n\t  FCFS" +
 					"\n\t  RR" +
@@ -41,13 +42,20 @@ public class Runner {
 		}
 		
 		try {
-			fileReader = new FileReader(args[0]);
+			fileReader = new FileReader(args[args.length - 2]);
 			fileReader.read(inputBuffer);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Error: The file name supplied was not found.");
 			System.exit(1);
 		}
+
+		try{
+			verbose = args[0].equals("--verbose");
+		} catch (IndexOutOfBoundsException e){
+			// Don't do anything
+		}
+
 		
 		//st = new StreamTokenizer(fileReader);
 		String input = String.valueOf(inputBuffer);
@@ -56,8 +64,8 @@ public class Runner {
 		//Properly formatted input starts with the number of processes.
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		
-		System.out.println(args[0]);
-		System.out.println("Scheduling Algorithm is: " + valueOf(args[1]));
+		System.out.println(args[args.length - 2]);
+		System.out.println("Scheduling Algorithm is: " + valueOf(args[args.length - 1]));
 		System.out.println("Number of Processes: " + numberOfProcesses);
 	
 		/* Make processes from the input and place them into priority queues.  
@@ -69,7 +77,7 @@ public class Runner {
 		}		
 
 		/** Here we retrieve the Algo Type based on the input **/
-		SchedulingAlgo algo = valueOf(args[1]).getSchedulingAlgo(numberOfProcesses);
+		SchedulingAlgo algo = valueOf(args[args.length - 1]).getSchedulingAlgo(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
@@ -79,8 +87,8 @@ public class Runner {
 		for(Process p : pArray){
 			System.out.println(p);
 		}
-		System.out.println("pRatio may be ignored for non-HPRN algos\n");
-			
+		
+		System.out.println("pRatio may be ignored for non-HPRN algos\n");		
 		
 		algo.capturePrintQueue();
 		while(!algo.isFinished())
@@ -140,11 +148,19 @@ public class Runner {
 		String nextRandomNumber = null;
 		
 		try {
-			nextRandomNumber = randomReader.getNextLine();
+			nextRandomNumber = randomReader.getNextRandomNumber();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+				
+		int randomOS = U == 0 ? 1 : 1 + (Integer.valueOf(nextRandomNumber) % U);
 		
-		return U == 0 ? 1 : 1 + (Integer.valueOf(nextRandomNumber) % U);
+		if(verbose){
+			System.out.println("The next random number is: " + nextRandomNumber);
+			System.out.println("The value of 1 + ("+ nextRandomNumber +" % "+ U 
+				+ ") is: "+ randomOS);
+		}
+
+		return randomOS;
 	}
 }

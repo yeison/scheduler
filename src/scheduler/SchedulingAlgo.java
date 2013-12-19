@@ -1,5 +1,7 @@
 package scheduler;
 
+import static scheduler.Runner.verbose;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -215,7 +217,8 @@ abstract public class SchedulingAlgo {
 			+ currentProcess.getRemainingBurst();
 		}
  
-		System.out.println("Before cycle " + cycle + ": " + cycleLine);
+		if(verbose)
+			System.out.println("Before cycle " + cycle + ": " + cycleLine);
 	}
 	
 	//Indicates that all processes have finished running.

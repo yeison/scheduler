@@ -56,6 +56,9 @@ public class Process implements Comparable<Process>{
 	
 	void setRemainingBurst(int burst){
 		remainingBurst = randomOS(burst);
+		if(Runner.verbose)
+			System.out.println("This value of randomOS("+ burst +") is assigned to process "
+					+ this.processInstance);
 		burstDuration = 0;
 	}
 	
