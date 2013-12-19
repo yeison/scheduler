@@ -1,10 +1,11 @@
 package scheduler;
-import static scheduler.AlgoTypes.valueOf;
 
+import scheduler.AlgoTypes;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
+
 
 /** @author Yeison Rodriguez */
 public class Runner {
@@ -55,6 +56,8 @@ public class Runner {
 		} catch (IndexOutOfBoundsException e){
 			// Don't do anything
 		}
+		
+		AlgoTypes algoType = AlgoTypes.valueOf((args[args.length - 1]).trim());
 
 		
 		//st = new StreamTokenizer(fileReader);
@@ -65,7 +68,7 @@ public class Runner {
 		numberOfProcesses = Integer.valueOf(st.nextToken());
 		
 		System.out.println(args[args.length - 2]);
-		System.out.println("Scheduling Algorithm is: " + valueOf(args[args.length - 1]));
+		System.out.println("Scheduling Algorithm is: " + algoType);
 		System.out.println("Number of Processes: " + numberOfProcesses);
 	
 		/* Make processes from the input and place them into priority queues.  
@@ -77,7 +80,7 @@ public class Runner {
 		}		
 
 		/** Here we retrieve the Algo Type based on the input **/
-		SchedulingAlgo algo = valueOf(args[args.length - 1]).getSchedulingAlgo(numberOfProcesses);
+		SchedulingAlgo algo = algoType.getSchedulingAlgo(numberOfProcesses);
 		Process[] pArray = new Process[numberOfProcesses];
 		for(int i = 0; i < pArray.length; i++){
 			pArray[i] = processQueue.poll();
